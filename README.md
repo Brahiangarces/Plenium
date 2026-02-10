@@ -1,7 +1,9 @@
 APLICACION MOVIL DE COMERCIO ELECTRONICO
 
 Informacion Academica
+
 Universidad : Salazar y Herrera
+
 Asignatura :Lenguajes de Programacion para Dispositivos Moviles
 
 Integrantes del grupo
@@ -25,10 +27,17 @@ La aplicacion Permite a los usuarios explorar productos, agregarlos al carrito y
 pedidos , todo desde una interfaz sencillay orientada a una correcta experiencia de usuario.
 
 Funcionalidades
+
 Registro e inicio de sesión de usuarios
+
 Catálogo de productos
+
 Visualización de detalle de producto
+
 Carrito de compras
+
 Gestión básica de pedidos
+
  Persistencia local de datos
+ 
 Diseño enfocado en experiencia móvil (UX)
