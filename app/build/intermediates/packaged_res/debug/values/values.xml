@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="http://schemas.android.com/tools">
+    <string name="app_name">Plenium Ecommerce</string>
+    <style name="Theme.PleniumEcommerce" parent="Theme.AppCompat.Light.NoActionBar">
+        
+        <item name="colorPrimary">#8B4513</item>
+        <item name="colorPrimaryVariant">#6B3410</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        
+        <item name="colorSecondary">#8B4513</item>
+        <item name="colorSecondaryVariant">#6B3410</item>
+        <item name="colorOnSecondary">@android:color/black</item>
+        
+        <item name="android:statusBarColor" ns1:targetApi="l">?attr/colorPrimaryVariant</item>
+        
+    </style>
+</resources>
