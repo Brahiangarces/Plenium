@@ -147,6 +147,64 @@
       display: none;
     }
 
+    .notification-wrap {
+      position: relative;
+    }
+
+    .bell-button {
+      position: relative;
+    }
+
+    .bell-button[hidden] {
+      display: none;
+    }
+
+    .bell-count {
+      position: absolute;
+      top: -7px;
+      right: -7px;
+      display: none;
+      place-items: center;
+      min-width: 21px;
+      height: 21px;
+      padding: 0 5px;
+      color: #fff;
+      background: var(--accent-2);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .bell-count.show {
+      display: grid;
+    }
+
+    .notification-panel {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      z-index: 45;
+      display: none;
+      width: min(360px, calc(100vw - 28px));
+      max-height: min(460px, calc(100vh - 150px));
+      overflow: auto;
+      padding: 14px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .notification-panel.open {
+      display: grid;
+      gap: 10px;
+    }
+
+    .notification-panel h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
     .cart-count {
       position: absolute;
       top: -7px;
@@ -1130,26 +1188,6 @@
       color: var(--ink);
     }
 
-    .client-notice {
-      display: grid;
-      gap: 12px;
-      width: min(1120px, calc(100% - 36px));
-      margin: 18px auto 0;
-      padding: 16px;
-      background: #fff8ec;
-      border: 1px solid #f0d5a8;
-      border-radius: 8px;
-    }
-
-    .client-notice[hidden] {
-      display: none;
-    }
-
-    .client-notice h3 {
-      margin: 0;
-      font-size: 18px;
-    }
-
     .client-notice-list {
       display: grid;
       gap: 8px;
@@ -1159,12 +1197,13 @@
     }
 
     .client-notice-list li {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
+      display: grid;
       gap: 8px;
+      padding: 10px;
       color: var(--muted);
+      background: #fff8ec;
+      border: 1px solid #f0d5a8;
+      border-radius: 8px;
       line-height: 1.45;
     }
 
@@ -1345,6 +1384,21 @@
     <div class="nav-actions">
       <span class="user-pill" data-user-pill></span>
       <button class="auth-button" type="button" data-auth-button>Iniciar sesion</button>
+      <div class="notification-wrap">
+        <button class="icon-btn bell-button" type="button" aria-label="Ver notificaciones" data-bell-button hidden>
+          <span aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10 21h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="bell-count" data-bell-count>0</span>
+        </button>
+        <div class="notification-panel" data-client-notice>
+          <h3>Notificaciones</h3>
+          <ul class="client-notice-list" data-client-notice-list></ul>
+        </div>
+      </div>
       <button class="cart-button" type="button" aria-label="Abrir carrito" data-open-cart>
         <span aria-hidden="true">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -1357,11 +1411,6 @@
       </button>
     </div>
   </nav>
-
-  <section class="client-notice" data-client-notice hidden>
-    <h3>Estado de tus pagos</h3>
-    <ul class="client-notice-list" data-client-notice-list></ul>
-  </section>
 
   <main id="inicio">
     <section class="hero">
@@ -1945,6 +1994,8 @@
     const adminNoticeText = document.querySelector("[data-admin-notice-text]");
     const clientNotice = document.querySelector("[data-client-notice]");
     const clientNoticeList = document.querySelector("[data-client-notice-list]");
+    const bellButton = document.querySelector("[data-bell-button]");
+    const bellCount = document.querySelector("[data-bell-count]");
     const authHint = document.querySelector("[data-auth-hint]");
     const authTitle = document.getElementById("authTitle");
     const authSubmit = document.querySelector("[data-auth-submit]");
@@ -2277,12 +2328,24 @@
 
     function renderClientNotifications() {
       const clientOrders = getClientOrders().slice(-4).reverse();
-      clientNotice.hidden = !currentUser || currentUser.role !== "cliente" || !clientOrders.length;
-      if (clientNotice.hidden) {
+      const canShow = currentUser?.role === "cliente";
+      bellButton.hidden = !canShow;
+      clientNotice.classList.toggle("open", canShow && clientNotice.classList.contains("open"));
+      if (!canShow) {
+        clientNotice.classList.remove("open");
         clientNoticeList.innerHTML = "";
+        bellCount.classList.remove("show");
+        bellCount.textContent = "0";
         return;
       }
-      clientNoticeList.innerHTML = clientOrders.map(order => {
+      const unreadCount = clientOrders.filter(order => {
+        const status = order.status || "Pendiente de confirmacion";
+        if (status !== "Pago confirmado" && status !== "Pago rechazado") return false;
+        return seenClientStatuses[`${currentUser.email}:${order.id}`] !== status;
+      }).length;
+      bellCount.textContent = unreadCount;
+      bellCount.classList.toggle("show", unreadCount > 0);
+      clientNoticeList.innerHTML = clientOrders.length ? clientOrders.map(order => {
         const status = order.status || "Pendiente de confirmacion";
         const statusClass = status === "Pago confirmado" ? "confirmed" : status === "Pago rechazado" ? "rejected" : "";
         return `
@@ -2291,7 +2354,7 @@
             <span class="status-pill ${statusClass}">${escapeHTML(status)}</span>
           </li>
         `;
-      }).join("");
+      }).join("") : '<li>Aun no tienes notificaciones de pago.</li>';
     }
 
     function notifyClientPaymentUpdates() {
@@ -2300,10 +2363,22 @@
         if (order.status !== "Pago confirmado" && order.status !== "Pago rechazado") return;
         const key = `${currentUser.email}:${order.id}`;
         if (seenClientStatuses[key] === order.status) return;
-        seenClientStatuses[key] = order.status;
-        saveSeenClientStatuses();
         showToast(order.status === "Pago confirmado" ? "Tu pago fue confirmado" : "Tu pago fue rechazado");
       });
+    }
+
+    function markClientNotificationsSeen() {
+      if (currentUser?.role !== "cliente") return;
+      let changed = false;
+      getClientOrders().forEach(order => {
+        if (order.status !== "Pago confirmado" && order.status !== "Pago rechazado") return;
+        const key = `${currentUser.email}:${order.id}`;
+        if (seenClientStatuses[key] === order.status) return;
+        seenClientStatuses[key] = order.status;
+        changed = true;
+      });
+      if (changed) saveSeenClientStatuses();
+      renderClientNotifications();
     }
 
     function updateAuthUI() {
@@ -2650,6 +2725,20 @@
         return;
       }
       openAuth();
+    });
+    bellButton.addEventListener("click", event => {
+      event.stopPropagation();
+      if (!currentUser) {
+        openAuth();
+        return;
+      }
+      clientNotice.classList.toggle("open");
+      if (clientNotice.classList.contains("open")) markClientNotificationsSeen();
+    });
+    document.addEventListener("click", event => {
+      if (!event.target.closest(".notification-wrap")) {
+        clientNotice.classList.remove("open");
+      }
     });
     document.querySelectorAll("[data-client-auth-mode]").forEach(tab => {
       tab.addEventListener("click", () => setClientAuthMode(tab.dataset.clientAuthMode));
