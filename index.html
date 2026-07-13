@@ -143,6 +143,10 @@
       font-weight: 800;
     }
 
+    .cart-button[hidden] {
+      display: none;
+    }
+
     .cart-count {
       position: absolute;
       top: -7px;
@@ -2153,6 +2157,7 @@
       authButton.textContent = currentUser ? "Cerrar sesion" : "Iniciar sesion";
       userPill.textContent = currentUser ? `${isAdmin ? "Admin" : "Cliente"}: ${currentUser.email}` : "";
       userPill.classList.toggle("show", Boolean(currentUser));
+      openCartButton.hidden = !currentUser || isAdmin;
       document.body.classList.toggle("admin-mode", isAdmin);
       adminPanel.classList.toggle("show", isAdmin);
       adminLink.hidden = !isAdmin;
@@ -2449,7 +2454,10 @@
       openQuickView(quickButton.closest(".product"));
     });
 
-    openCartButton.addEventListener("click", openCart);
+    openCartButton.addEventListener("click", () => {
+      if (!requireLogin("Inicia sesion para ver el carrito")) return;
+      openCart();
+    });
     document.querySelectorAll("[data-close-cart]").forEach(button => button.addEventListener("click", closeCart));
     document.querySelector("[data-close-auth]").addEventListener("click", closeAuth);
     document.querySelector("[data-close-payment]").addEventListener("click", closePayment);
@@ -2467,6 +2475,9 @@
       if (currentUser) {
         currentUser = null;
         localStorage.removeItem(storageKeys.user);
+        cart.clear();
+        closeCart();
+        renderCart();
         showToast("Sesion cerrada");
         updateAuthUI();
         return;
