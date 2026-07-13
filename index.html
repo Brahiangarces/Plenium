@@ -1009,6 +1009,18 @@
       line-height: 1.45;
     }
 
+    .receipt-preview {
+      display: none;
+      width: 120px;
+      max-width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .receipt-preview.show {
+      display: block;
+    }
+
     .payment-settings {
       display: grid;
       gap: 16px;
@@ -1060,6 +1072,21 @@
     .status-pill.rejected {
       color: #9a3412;
       background: #ffedd5;
+    }
+
+    .receipt-link {
+      display: inline-block;
+      width: 64px;
+      height: 64px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .receipt-link img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .admin-notice {
@@ -1645,13 +1672,14 @@
                 <th>Pedido</th>
                 <th>Total</th>
                 <th>Pago</th>
+                <th>Comprobante</th>
                 <th>Estado</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody data-admin-order-list>
               <tr>
-                <td colspan="6">Aun no hay pedidos finalizados en esta sesion.</td>
+                <td colspan="7">Aun no hay pedidos finalizados en esta sesion.</td>
               </tr>
             </tbody>
           </table>
@@ -1794,6 +1822,12 @@
             <span data-payment-detail-notes></span>
             <img data-payment-detail-qr alt="QR del metodo de pago" hidden>
           </div>
+          <label class="field">
+            Comprobante de pago
+            <input type="file" name="receipt" accept="image/*" data-receipt-file>
+            <span class="hint">Sube una foto o captura del comprobante. Para efectivo es opcional. Maximo 2 MB.</span>
+            <img class="receipt-preview" alt="Vista previa del comprobante" data-receipt-preview>
+          </label>
           <button class="btn" type="submit">Registrar compra</button>
         </form>
       </div>
@@ -1818,6 +1852,7 @@
       currency: "COP",
       maximumFractionDigits: 0
     });
+    const maxStoredImageSize = 2 * 1024 * 1024;
 
     const cart = new Map();
     const cartDrawer = document.querySelector(".cart-drawer");
@@ -1839,6 +1874,7 @@
     const paymentDetailAccount = document.querySelector("[data-payment-detail-account]");
     const paymentDetailNotes = document.querySelector("[data-payment-detail-notes]");
     const paymentDetailQr = document.querySelector("[data-payment-detail-qr]");
+    const receiptPreview = document.querySelector("[data-receipt-preview]");
     const adminNotice = document.querySelector("[data-admin-notice]");
     const adminNoticeText = document.querySelector("[data-admin-notice-text]");
     const authHint = document.querySelector("[data-auth-hint]");
@@ -1935,6 +1971,8 @@
     function closePayment() {
       paymentModal.classList.remove("open");
       document.getElementById("paymentForm").reset();
+      receiptPreview.classList.remove("show");
+      receiptPreview.removeAttribute("src");
       renderPaymentDetail("");
     }
 
@@ -2328,7 +2366,7 @@
       }
       const list = document.querySelector("[data-admin-order-list]");
       if (!orders.length) {
-        list.innerHTML = '<tr><td colspan="6">Aun no hay pedidos finalizados en esta sesion.</td></tr>';
+        list.innerHTML = '<tr><td colspan="7">Aun no hay pedidos finalizados en esta sesion.</td></tr>';
         return;
       }
       list.innerHTML = orders.slice(-6).reverse().map(order => `
@@ -2337,6 +2375,7 @@
           <td>${escapeHTML(order.items)}</td>
           <td>${formatter.format(order.total)}</td>
           <td>${escapeHTML(order.payment || "Sin metodo")}</td>
+          <td>${order.receipt ? `<a class="receipt-link" href="${order.receipt}" target="_blank" rel="noopener" aria-label="Ver comprobante"><img src="${order.receipt}" alt="Comprobante"></a>` : "Sin comprobante"}</td>
           <td><span class="status-pill ${order.status === "Pago confirmado" ? "confirmed" : order.status === "Pago rechazado" ? "rejected" : ""}">${escapeHTML(order.status || "Pendiente de confirmacion")}</span></td>
           <td>
             <div class="admin-actions">
@@ -2589,7 +2628,7 @@
       openPayment();
     });
 
-    document.getElementById("paymentForm").addEventListener("submit", event => {
+    document.getElementById("paymentForm").addEventListener("submit", async event => {
       event.preventDefault();
       if (!requireLogin("Inicia sesion para finalizar la compra")) return;
       if (!cart.size) {
@@ -2601,12 +2640,27 @@
       const readableOrder = items.map(item => `${item.qty} x ${item.name}`).join(", ");
       const totalNumber = items.reduce((sum, item) => sum + item.qty * item.price, 0);
       const payment = new FormData(event.currentTarget).get("payment");
+      const receiptFile = new FormData(event.currentTarget).get("receipt");
+      const needsReceipt = payment !== "Efectivo contra entrega";
+      if (needsReceipt && (!(receiptFile instanceof File) || !receiptFile.size)) {
+        showToast("Sube el comprobante de pago");
+        return;
+      }
+      if (receiptFile instanceof File && receiptFile.size > maxStoredImageSize) {
+        showToast("El comprobante debe pesar maximo 2 MB");
+        return;
+      }
+      let receipt = "";
+      if (receiptFile instanceof File && receiptFile.size) {
+        receipt = await readImageFile(receiptFile);
+      }
       const order = {
         id: `PED-${Date.now()}`,
         customer: currentUser.email,
         items: readableOrder,
         total: totalNumber,
         payment,
+        receipt,
         status: "Pendiente de confirmacion",
         createdAt: new Date().toLocaleString("es-CO")
       };
@@ -2625,6 +2679,25 @@
       if (event.target.name === "payment") {
         renderPaymentDetail(event.target.value);
       }
+      if (event.target.name === "receipt") {
+        const file = event.target.files?.[0];
+        if (!file) {
+          receiptPreview.classList.remove("show");
+          receiptPreview.removeAttribute("src");
+          return;
+        }
+        if (file.size > maxStoredImageSize) {
+          event.target.value = "";
+          receiptPreview.classList.remove("show");
+          receiptPreview.removeAttribute("src");
+          showToast("El comprobante debe pesar maximo 2 MB");
+          return;
+        }
+        readImageFile(file).then(result => {
+          receiptPreview.src = result;
+          receiptPreview.classList.add("show");
+        });
+      }
     });
 
     document.getElementById("paymentSettingsForm").addEventListener("submit", async event => {
@@ -2638,6 +2711,9 @@
         const entries = await Promise.all(Object.keys(paymentSettings).map(async method => {
           const file = form.get(`${method}_qrFile`);
           const hasNewQr = file instanceof File && file.size > 0;
+          if (hasNewQr && file.size > maxStoredImageSize) {
+            throw new Error("La imagen QR debe pesar maximo 2 MB");
+          }
           return [method, {
             account: form.get(`${method}_account`)?.trim() || "",
             qr: hasNewQr ? await readImageFile(file) : paymentSettings[method].qr || "",
@@ -2650,7 +2726,7 @@
         fillPaymentSettingsForm();
         showToast("Datos de pago guardados");
       } catch (error) {
-        showToast("No se pudo cargar el QR");
+        showToast(error.message || "No se pudo cargar el QR");
       }
     });
 
