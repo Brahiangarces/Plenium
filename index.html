@@ -1078,15 +1078,38 @@
       display: inline-block;
       width: 64px;
       height: 64px;
+      padding: 0;
       overflow: hidden;
       border: 1px solid var(--line);
       border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
     }
 
     .receipt-link img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+    }
+
+    .receipt-detail {
+      display: grid;
+      gap: 14px;
+    }
+
+    .receipt-detail img {
+      width: 100%;
+      max-height: 70vh;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      object-fit: contain;
+      background: #fbf7f1;
+    }
+
+    .receipt-detail p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
     }
 
     .admin-notice {
@@ -1882,6 +1905,7 @@
     const authSubmit = document.querySelector("[data-auth-submit]");
     const productGrid = document.querySelector("[data-products]");
     const quickModal = document.querySelector("[data-quick-modal]");
+    const quickTitle = document.getElementById("quickTitle");
     const quickContent = document.querySelector("[data-quick-content]");
     const openCartButton = document.querySelector("[data-open-cart]");
     const storageKeys = {
@@ -2006,6 +2030,18 @@
     function closeQuickView() {
       quickModal.classList.remove("open");
       quickContent.innerHTML = "";
+      quickTitle.textContent = "Detalle del producto";
+    }
+
+    function openReceiptPreview(order) {
+      quickTitle.textContent = "Comprobante de pago";
+      quickContent.innerHTML = `
+        <div class="receipt-detail">
+          <p><strong>Cliente:</strong> ${escapeHTML(order.customer)}<br><strong>Metodo:</strong> ${escapeHTML(order.payment || "Sin metodo")}<br><strong>Total:</strong> ${formatter.format(order.total)}</p>
+          <img src="${order.receipt}" alt="Comprobante de pago enviado por ${escapeHTML(order.customer)}">
+        </div>
+      `;
+      quickModal.classList.add("open");
     }
 
     function setClientAuthMode(mode) {
@@ -2375,7 +2411,7 @@
           <td>${escapeHTML(order.items)}</td>
           <td>${formatter.format(order.total)}</td>
           <td>${escapeHTML(order.payment || "Sin metodo")}</td>
-          <td>${order.receipt ? `<a class="receipt-link" href="${order.receipt}" target="_blank" rel="noopener" aria-label="Ver comprobante"><img src="${order.receipt}" alt="Comprobante"></a>` : "Sin comprobante"}</td>
+          <td>${order.receipt ? `<button class="receipt-link" type="button" data-preview-receipt="${escapeHTML(order.id || "")}" aria-label="Previsualizar comprobante"><img src="${order.receipt}" alt="Comprobante"></button>` : "Sin comprobante"}</td>
           <td><span class="status-pill ${order.status === "Pago confirmado" ? "confirmed" : order.status === "Pago rechazado" ? "rejected" : ""}">${escapeHTML(order.status || "Pendiente de confirmacion")}</span></td>
           <td>
             <div class="admin-actions">
@@ -2591,8 +2627,14 @@
     });
 
     document.querySelector("[data-admin-order-list]").addEventListener("click", event => {
+      const previewButton = event.target.closest("[data-preview-receipt]");
       const confirmButton = event.target.closest("[data-confirm-payment]");
       const rejectButton = event.target.closest("[data-reject-payment]");
+      if (previewButton) {
+        const order = orders.find(item => item.id === previewButton.dataset.previewReceipt);
+        if (order?.receipt) openReceiptPreview(order);
+        return;
+      }
       if (!confirmButton && !rejectButton) return;
       const id = confirmButton?.dataset.confirmPayment || rejectButton?.dataset.rejectPayment;
       const order = orders.find(item => item.id === id);
