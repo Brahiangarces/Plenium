@@ -912,6 +912,86 @@
       line-height: 1.45;
     }
 
+    .payment-summary {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding: 14px;
+      background: #fbf7f1;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .payment-summary strong {
+      color: var(--ink);
+    }
+
+    .payment-items {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .payment-methods {
+      display: grid;
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .payment-option {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .payment-option:has(input:checked) {
+      border-color: var(--coffee);
+      box-shadow: 0 0 0 3px rgba(124, 76, 46, .12);
+    }
+
+    .payment-option input {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      accent-color: var(--coffee);
+    }
+
+    .payment-option strong,
+    .payment-option span {
+      display: block;
+    }
+
+    .payment-option span {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .admin-notice {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 18px;
+      padding: 14px;
+      background: #fff8ec;
+      border: 1px solid #f0d5a8;
+      border-radius: 8px;
+    }
+
+    .admin-notice[hidden] {
+      display: none;
+    }
+
+    .admin-notice strong {
+      color: var(--ink);
+    }
+
     .admin-panel {
       display: none;
       margin-top: 28px;
@@ -1314,6 +1394,11 @@
         </div>
       </div>
 
+      <div class="admin-notice" data-admin-notice hidden>
+        <strong data-admin-notice-title>Nueva compra recibida</strong>
+        <span data-admin-notice-text></span>
+      </div>
+
       <div class="admin-layout">
         <form class="contact-panel" id="adminProductForm">
           <h3 data-admin-form-title>Agregar producto</h3>
@@ -1391,11 +1476,12 @@
                 <th>Cliente</th>
                 <th>Pedido</th>
                 <th>Total</th>
+                <th>Pago</th>
               </tr>
             </thead>
             <tbody data-admin-order-list>
               <tr>
-                <td colspan="3">Aun no hay pedidos finalizados en esta sesion.</td>
+                <td colspan="4">Aun no hay pedidos finalizados en esta sesion.</td>
               </tr>
             </tbody>
           </table>
@@ -1497,6 +1583,47 @@
     </div>
   </div>
 
+  <div class="modal-backdrop" data-payment-modal>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="paymentTitle">
+      <div class="modal-head">
+        <h3 id="paymentTitle">Elige forma de pago</h3>
+        <button class="icon-btn" type="button" aria-label="Cerrar pago" data-close-payment>x</button>
+      </div>
+      <div class="modal-body">
+        <p class="hint">Selecciona el metodo con el que vas a pagar. Al confirmar, registraremos tu compra y el administrador vera la notificacion.</p>
+        <div class="payment-summary">
+          <strong>Resumen del pedido</strong>
+          <ul class="payment-items" data-payment-items></ul>
+          <div class="total-line">
+            <span>Total</span>
+            <span data-payment-total>$0</span>
+          </div>
+        </div>
+        <form id="paymentForm">
+          <div class="payment-methods">
+            <label class="payment-option">
+              <input type="radio" name="payment" value="Nequi" required>
+              <span><strong>Nequi</strong><span>Envia el total al numero de la tienda y conserva el comprobante.</span></span>
+            </label>
+            <label class="payment-option">
+              <input type="radio" name="payment" value="Daviplata">
+              <span><strong>Daviplata</strong><span>Paga desde tu billetera y comparte el soporte si el administrador lo solicita.</span></span>
+            </label>
+            <label class="payment-option">
+              <input type="radio" name="payment" value="Transferencia bancaria">
+              <span><strong>Transferencia bancaria</strong><span>Realiza una transferencia por el valor total del pedido.</span></span>
+            </label>
+            <label class="payment-option">
+              <input type="radio" name="payment" value="Efectivo contra entrega">
+              <span><strong>Efectivo contra entrega</strong><span>Paga al recibir tu pedido, sujeto a cobertura de entrega.</span></span>
+            </label>
+          </div>
+          <button class="btn" type="submit">Confirmar pago y compra</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-backdrop quick-modal" data-quick-modal>
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="quickTitle">
       <div class="modal-head">
@@ -1528,6 +1655,11 @@
     const userPill = document.querySelector("[data-user-pill]");
     const adminPanel = document.querySelector("[data-admin-panel]");
     const adminLink = document.querySelector("[data-admin-link]");
+    const paymentModal = document.querySelector("[data-payment-modal]");
+    const paymentItems = document.querySelector("[data-payment-items]");
+    const paymentTotal = document.querySelector("[data-payment-total]");
+    const adminNotice = document.querySelector("[data-admin-notice]");
+    const adminNoticeText = document.querySelector("[data-admin-notice-text]");
     const authHint = document.querySelector("[data-auth-hint]");
     const authTitle = document.getElementById("authTitle");
     const authSubmit = document.querySelector("[data-auth-submit]");
@@ -1538,6 +1670,7 @@
     const storageKeys = {
       user: "pleniumUser",
       orders: "pleniumOrders",
+      notifications: "pleniumAdminNotifications",
       products: "pleniumProducts",
       clients: "pleniumClients",
       legacyCustomProducts: "pleniumCustomProducts"
@@ -1545,6 +1678,7 @@
     let currentClientAuthMode = "login";
     let currentUser = JSON.parse(localStorage.getItem(storageKeys.user) || "null");
     let orders = JSON.parse(localStorage.getItem(storageKeys.orders) || "[]");
+    let adminNotifications = JSON.parse(localStorage.getItem(storageKeys.notifications) || "[]");
     let clients = JSON.parse(localStorage.getItem(storageKeys.clients) || "[]");
     const initialProducts = readInitialProducts();
     const savedProducts = JSON.parse(localStorage.getItem(storageKeys.products) || "null");
@@ -1577,6 +1711,20 @@
 
     function closeAuth() {
       authModal.classList.remove("open");
+    }
+
+    function openPayment() {
+      const items = [...cart.values()];
+      const totalNumber = items.reduce((sum, item) => sum + item.qty * item.price, 0);
+      paymentItems.innerHTML = items.map(item => `<li>${item.qty} x ${escapeHTML(item.name)}</li>`).join("");
+      paymentTotal.textContent = formatter.format(totalNumber);
+      paymentModal.classList.add("open");
+      paymentModal.querySelector("input[name='payment']").focus();
+    }
+
+    function closePayment() {
+      paymentModal.classList.remove("open");
+      document.getElementById("paymentForm").reset();
     }
 
     function closeQuickView() {
@@ -1666,6 +1814,10 @@
 
     function saveClients() {
       localStorage.setItem(storageKeys.clients, JSON.stringify(clients));
+    }
+
+    function saveAdminNotifications() {
+      localStorage.setItem(storageKeys.notifications, JSON.stringify(adminNotifications));
     }
 
     function findClient(email) {
@@ -1894,16 +2046,22 @@
       document.querySelector("[data-admin-clients]").textContent = clients.length;
       renderAdminProducts();
       renderAdminClients();
+      const lastNotification = adminNotifications[adminNotifications.length - 1];
+      adminNotice.hidden = !lastNotification;
+      if (lastNotification) {
+        adminNoticeText.textContent = `${lastNotification.customer} compro ${lastNotification.items} por ${formatter.format(lastNotification.total)}. Pago: ${lastNotification.payment}.`;
+      }
       const list = document.querySelector("[data-admin-order-list]");
       if (!orders.length) {
-        list.innerHTML = '<tr><td colspan="3">Aun no hay pedidos finalizados en esta sesion.</td></tr>';
+        list.innerHTML = '<tr><td colspan="4">Aun no hay pedidos finalizados en esta sesion.</td></tr>';
         return;
       }
       list.innerHTML = orders.slice(-6).reverse().map(order => `
         <tr>
-          <td>${order.customer}</td>
-          <td>${order.items}</td>
+          <td>${escapeHTML(order.customer)}</td>
+          <td>${escapeHTML(order.items)}</td>
           <td>${formatter.format(order.total)}</td>
+          <td>${escapeHTML(order.payment || "Sin metodo")}</td>
         </tr>
       `).join("");
     }
@@ -2004,6 +2162,7 @@
       if (event.key !== "Escape") return;
       closeCart();
       closeAuth();
+      closePayment();
       closeQuickView();
     });
 
@@ -2016,9 +2175,13 @@
     openCartButton.addEventListener("click", openCart);
     document.querySelectorAll("[data-close-cart]").forEach(button => button.addEventListener("click", closeCart));
     document.querySelector("[data-close-auth]").addEventListener("click", closeAuth);
+    document.querySelector("[data-close-payment]").addEventListener("click", closePayment);
     document.querySelector("[data-close-quick]").addEventListener("click", closeQuickView);
     authModal.addEventListener("click", event => {
       if (event.target === authModal) closeAuth();
+    });
+    paymentModal.addEventListener("click", event => {
+      if (event.target === paymentModal) closePayment();
     });
     quickModal.addEventListener("click", event => {
       if (event.target === quickModal) closeQuickView();
@@ -2118,19 +2281,40 @@
         showToast("Agrega productos antes de finalizar");
         return;
       }
+      closeCart();
+      openPayment();
+    });
+
+    document.getElementById("paymentForm").addEventListener("submit", event => {
+      event.preventDefault();
+      if (!requireLogin("Inicia sesion para finalizar la compra")) return;
+      if (!cart.size) {
+        closePayment();
+        showToast("Tu carrito esta vacio");
+        return;
+      }
       const items = [...cart.values()];
-      const order = items.map(item => `${item.qty} x ${item.name}`).join("%0A");
       const readableOrder = items.map(item => `${item.qty} x ${item.name}`).join(", ");
       const totalNumber = items.reduce((sum, item) => sum + item.qty * item.price, 0);
-      const total = cartTotal.textContent;
-      orders.push({
+      const payment = new FormData(event.currentTarget).get("payment");
+      const order = {
+        id: `PED-${Date.now()}`,
         customer: currentUser.email,
         items: readableOrder,
-        total: totalNumber
-      });
+        total: totalNumber,
+        payment,
+        status: "Pago confirmado",
+        createdAt: new Date().toLocaleString("es-CO")
+      };
+      orders.push(order);
       localStorage.setItem(storageKeys.orders, JSON.stringify(orders));
+      adminNotifications.push(order);
+      saveAdminNotifications();
+      cart.clear();
+      renderCart();
       renderAdmin();
-      window.location.href = `https://wa.me/573000000000?text=Hola%20Plenium%20Cafe,%20quiero%20hacer%20este%20pedido:%0A${order}%0ATotal:%20${encodeURIComponent(total)}`;
+      closePayment();
+      showToast("Compra exitosa. Administrador notificado");
     });
 
     document.getElementById("contactForm").addEventListener("submit", event => {
