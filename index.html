@@ -974,6 +974,73 @@
       line-height: 1.4;
     }
 
+    .payment-detail {
+      display: none;
+      gap: 12px;
+      margin: 14px 0 16px;
+      padding: 14px;
+      background: #fff8ec;
+      border: 1px solid #f0d5a8;
+      border-radius: 8px;
+    }
+
+    .payment-detail.show {
+      display: grid;
+    }
+
+    .payment-detail img {
+      width: min(180px, 100%);
+      aspect-ratio: 1;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .payment-detail span {
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .payment-settings {
+      display: grid;
+      gap: 16px;
+    }
+
+    .payment-setting-card {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .payment-setting-card h4 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      min-height: 28px;
+      align-items: center;
+      padding: 0 8px;
+      background: #f3ece5;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .status-pill.confirmed {
+      color: #116329;
+      background: #dafbe1;
+    }
+
+    .status-pill.rejected {
+      color: #9a3412;
+      background: #ffedd5;
+    }
+
     .admin-notice {
       display: grid;
       gap: 10px;
@@ -1399,6 +1466,82 @@
         <span data-admin-notice-text></span>
       </div>
 
+      <form class="contact-panel" id="paymentSettingsForm">
+        <h3>Datos para recibir pagos</h3>
+        <p class="hint">Estos datos se muestran al cliente segun el metodo de pago que seleccione.</p>
+        <div class="payment-settings">
+          <div class="payment-setting-card">
+            <h4>Nequi</h4>
+            <div class="field-grid">
+              <label class="field">
+                Numero celular
+                <input type="tel" name="Nequi_account" placeholder="Ej. 300 000 0000">
+              </label>
+              <label class="field">
+                QR URL
+                <input type="url" name="Nequi_qr" placeholder="https://...">
+              </label>
+              <label class="field full">
+                Instrucciones
+                <textarea name="Nequi_notes" placeholder="Ej. Envia el comprobante al WhatsApp de la tienda."></textarea>
+              </label>
+            </div>
+          </div>
+          <div class="payment-setting-card">
+            <h4>Daviplata</h4>
+            <div class="field-grid">
+              <label class="field">
+                Numero celular
+                <input type="tel" name="Daviplata_account" placeholder="Ej. 300 000 0000">
+              </label>
+              <label class="field">
+                QR URL
+                <input type="url" name="Daviplata_qr" placeholder="https://...">
+              </label>
+              <label class="field full">
+                Instrucciones
+                <textarea name="Daviplata_notes" placeholder="Ej. Paga desde Daviplata y guarda el soporte."></textarea>
+              </label>
+            </div>
+          </div>
+          <div class="payment-setting-card">
+            <h4>Transferencia bancaria</h4>
+            <div class="field-grid">
+              <label class="field">
+                Numero de cuenta
+                <input type="text" name="Transferencia bancaria_account" placeholder="Ej. Banco, tipo y numero de cuenta">
+              </label>
+              <label class="field">
+                QR URL
+                <input type="url" name="Transferencia bancaria_qr" placeholder="https://...">
+              </label>
+              <label class="field full">
+                Instrucciones
+                <textarea name="Transferencia bancaria_notes" placeholder="Ej. Escribe tu nombre en la referencia del pago."></textarea>
+              </label>
+            </div>
+          </div>
+          <div class="payment-setting-card">
+            <h4>Efectivo contra entrega</h4>
+            <div class="field-grid">
+              <label class="field">
+                Contacto o condicion
+                <input type="text" name="Efectivo contra entrega_account" placeholder="Ej. Disponible en entregas locales">
+              </label>
+              <label class="field">
+                QR URL
+                <input type="url" name="Efectivo contra entrega_qr" placeholder="Opcional">
+              </label>
+              <label class="field full">
+                Instrucciones
+                <textarea name="Efectivo contra entrega_notes" placeholder="Ej. Ten el valor exacto al recibir el pedido."></textarea>
+              </label>
+            </div>
+          </div>
+        </div>
+        <button class="btn" type="submit">Guardar datos de pago</button>
+      </form>
+
       <div class="admin-layout">
         <form class="contact-panel" id="adminProductForm">
           <h3 data-admin-form-title>Agregar producto</h3>
@@ -1477,11 +1620,13 @@
                 <th>Pedido</th>
                 <th>Total</th>
                 <th>Pago</th>
+                <th>Estado</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody data-admin-order-list>
               <tr>
-                <td colspan="4">Aun no hay pedidos finalizados en esta sesion.</td>
+                <td colspan="6">Aun no hay pedidos finalizados en esta sesion.</td>
               </tr>
             </tbody>
           </table>
@@ -1590,7 +1735,7 @@
         <button class="icon-btn" type="button" aria-label="Cerrar pago" data-close-payment>x</button>
       </div>
       <div class="modal-body">
-        <p class="hint">Selecciona el metodo con el que vas a pagar. Al confirmar, registraremos tu compra y el administrador vera la notificacion.</p>
+        <p class="hint">Selecciona el metodo con el que vas a pagar. Al registrar la compra, el administrador revisara si el pago se hizo o no.</p>
         <div class="payment-summary">
           <strong>Resumen del pedido</strong>
           <ul class="payment-items" data-payment-items></ul>
@@ -1618,7 +1763,13 @@
               <span><strong>Efectivo contra entrega</strong><span>Paga al recibir tu pedido, sujeto a cobertura de entrega.</span></span>
             </label>
           </div>
-          <button class="btn" type="submit">Confirmar pago y compra</button>
+          <div class="payment-detail" data-payment-detail>
+            <strong data-payment-detail-title></strong>
+            <span data-payment-detail-account></span>
+            <span data-payment-detail-notes></span>
+            <img data-payment-detail-qr alt="QR del metodo de pago" hidden>
+          </div>
+          <button class="btn" type="submit">Registrar compra</button>
         </form>
       </div>
     </div>
@@ -1658,6 +1809,11 @@
     const paymentModal = document.querySelector("[data-payment-modal]");
     const paymentItems = document.querySelector("[data-payment-items]");
     const paymentTotal = document.querySelector("[data-payment-total]");
+    const paymentDetail = document.querySelector("[data-payment-detail]");
+    const paymentDetailTitle = document.querySelector("[data-payment-detail-title]");
+    const paymentDetailAccount = document.querySelector("[data-payment-detail-account]");
+    const paymentDetailNotes = document.querySelector("[data-payment-detail-notes]");
+    const paymentDetailQr = document.querySelector("[data-payment-detail-qr]");
     const adminNotice = document.querySelector("[data-admin-notice]");
     const adminNoticeText = document.querySelector("[data-admin-notice-text]");
     const authHint = document.querySelector("[data-auth-hint]");
@@ -1671,6 +1827,7 @@
       user: "pleniumUser",
       orders: "pleniumOrders",
       notifications: "pleniumAdminNotifications",
+      paymentSettings: "pleniumPaymentSettings",
       products: "pleniumProducts",
       clients: "pleniumClients",
       legacyCustomProducts: "pleniumCustomProducts"
@@ -1678,7 +1835,34 @@
     let currentClientAuthMode = "login";
     let currentUser = JSON.parse(localStorage.getItem(storageKeys.user) || "null");
     let orders = JSON.parse(localStorage.getItem(storageKeys.orders) || "[]");
+    orders = orders.map((order, index) => ({
+      ...order,
+      id: order.id || `PED-OLD-${index}`,
+      status: order.status || "Pendiente de confirmacion"
+    }));
     let adminNotifications = JSON.parse(localStorage.getItem(storageKeys.notifications) || "[]");
+    let paymentSettings = JSON.parse(localStorage.getItem(storageKeys.paymentSettings) || "null") || {
+      "Nequi": {
+        account: "Configura el numero Nequi desde el panel administrador",
+        qr: "",
+        notes: "Realiza el pago y conserva el comprobante."
+      },
+      "Daviplata": {
+        account: "Configura el numero Daviplata desde el panel administrador",
+        qr: "",
+        notes: "Realiza el pago y conserva el comprobante."
+      },
+      "Transferencia bancaria": {
+        account: "Configura el numero de cuenta desde el panel administrador",
+        qr: "",
+        notes: "Realiza la transferencia por el valor total."
+      },
+      "Efectivo contra entrega": {
+        account: "Disponible segun cobertura de entrega",
+        qr: "",
+        notes: "Paga al recibir tu pedido."
+      }
+    };
     let clients = JSON.parse(localStorage.getItem(storageKeys.clients) || "[]");
     const initialProducts = readInitialProducts();
     const savedProducts = JSON.parse(localStorage.getItem(storageKeys.products) || "null");
@@ -1718,6 +1902,7 @@
       const totalNumber = items.reduce((sum, item) => sum + item.qty * item.price, 0);
       paymentItems.innerHTML = items.map(item => `<li>${item.qty} x ${escapeHTML(item.name)}</li>`).join("");
       paymentTotal.textContent = formatter.format(totalNumber);
+      renderPaymentDetail("");
       paymentModal.classList.add("open");
       paymentModal.querySelector("input[name='payment']").focus();
     }
@@ -1725,6 +1910,34 @@
     function closePayment() {
       paymentModal.classList.remove("open");
       document.getElementById("paymentForm").reset();
+      renderPaymentDetail("");
+    }
+
+    function renderPaymentDetail(method) {
+      const settings = paymentSettings[method];
+      paymentDetail.classList.toggle("show", Boolean(settings));
+      if (!settings) {
+        paymentDetailTitle.textContent = "";
+        paymentDetailAccount.textContent = "";
+        paymentDetailNotes.textContent = "";
+        paymentDetailQr.hidden = true;
+        paymentDetailQr.removeAttribute("src");
+        return;
+      }
+      paymentDetailTitle.textContent = `Datos para pagar con ${method}`;
+      paymentDetailAccount.textContent = method === "Transferencia bancaria"
+        ? `Cuenta: ${settings.account || "Pendiente por configurar"}`
+        : method === "Efectivo contra entrega"
+          ? `Condicion: ${settings.account || "Pendiente por configurar"}`
+          : `Numero celular: ${settings.account || "Pendiente por configurar"}`;
+      paymentDetailNotes.textContent = settings.notes || "Confirma el pago cuando lo hayas realizado.";
+      if (settings.qr) {
+        paymentDetailQr.src = settings.qr;
+        paymentDetailQr.hidden = false;
+      } else {
+        paymentDetailQr.hidden = true;
+        paymentDetailQr.removeAttribute("src");
+      }
     }
 
     function closeQuickView() {
@@ -1818,6 +2031,23 @@
 
     function saveAdminNotifications() {
       localStorage.setItem(storageKeys.notifications, JSON.stringify(adminNotifications));
+    }
+
+    function saveOrders() {
+      localStorage.setItem(storageKeys.orders, JSON.stringify(orders));
+    }
+
+    function savePaymentSettings() {
+      localStorage.setItem(storageKeys.paymentSettings, JSON.stringify(paymentSettings));
+    }
+
+    function fillPaymentSettingsForm() {
+      const form = document.getElementById("paymentSettingsForm");
+      Object.entries(paymentSettings).forEach(([method, settings]) => {
+        if (form.elements[`${method}_account`]) form.elements[`${method}_account`].value = settings.account || "";
+        if (form.elements[`${method}_qr`]) form.elements[`${method}_qr`].value = settings.qr || "";
+        if (form.elements[`${method}_notes`]) form.elements[`${method}_notes`].value = settings.notes || "";
+      });
     }
 
     function findClient(email) {
@@ -2039,7 +2269,9 @@
     }
 
     function renderAdmin() {
-      const total = orders.reduce((sum, order) => sum + order.total, 0);
+      const total = orders
+        .filter(order => order.status === "Pago confirmado")
+        .reduce((sum, order) => sum + order.total, 0);
       document.querySelector("[data-admin-sales]").textContent = formatter.format(total);
       document.querySelector("[data-admin-orders]").textContent = orders.length;
       document.querySelector("[data-admin-products]").textContent = products.length;
@@ -2049,11 +2281,11 @@
       const lastNotification = adminNotifications[adminNotifications.length - 1];
       adminNotice.hidden = !lastNotification;
       if (lastNotification) {
-        adminNoticeText.textContent = `${lastNotification.customer} compro ${lastNotification.items} por ${formatter.format(lastNotification.total)}. Pago: ${lastNotification.payment}.`;
+        adminNoticeText.textContent = `${lastNotification.customer} compro ${lastNotification.items} por ${formatter.format(lastNotification.total)}. Metodo: ${lastNotification.payment}. Estado: ${lastNotification.status}.`;
       }
       const list = document.querySelector("[data-admin-order-list]");
       if (!orders.length) {
-        list.innerHTML = '<tr><td colspan="4">Aun no hay pedidos finalizados en esta sesion.</td></tr>';
+        list.innerHTML = '<tr><td colspan="6">Aun no hay pedidos finalizados en esta sesion.</td></tr>';
         return;
       }
       list.innerHTML = orders.slice(-6).reverse().map(order => `
@@ -2062,6 +2294,13 @@
           <td>${escapeHTML(order.items)}</td>
           <td>${formatter.format(order.total)}</td>
           <td>${escapeHTML(order.payment || "Sin metodo")}</td>
+          <td><span class="status-pill ${order.status === "Pago confirmado" ? "confirmed" : order.status === "Pago rechazado" ? "rejected" : ""}">${escapeHTML(order.status || "Pendiente de confirmacion")}</span></td>
+          <td>
+            <div class="admin-actions">
+              <button class="text-button" type="button" data-confirm-payment="${escapeHTML(order.id || "")}">Pago si</button>
+              <button class="text-button danger" type="button" data-reject-payment="${escapeHTML(order.id || "")}">Pago no</button>
+            </div>
+          </td>
         </tr>
       `).join("");
     }
@@ -2263,6 +2502,22 @@
       }
     });
 
+    document.querySelector("[data-admin-order-list]").addEventListener("click", event => {
+      const confirmButton = event.target.closest("[data-confirm-payment]");
+      const rejectButton = event.target.closest("[data-reject-payment]");
+      if (!confirmButton && !rejectButton) return;
+      const id = confirmButton?.dataset.confirmPayment || rejectButton?.dataset.rejectPayment;
+      const order = orders.find(item => item.id === id);
+      if (!order) return;
+      order.status = confirmButton ? "Pago confirmado" : "Pago rechazado";
+      order.reviewedAt = new Date().toLocaleString("es-CO");
+      saveOrders();
+      adminNotifications.push(order);
+      saveAdminNotifications();
+      renderAdmin();
+      showToast(confirmButton ? "Pago confirmado" : "Pago marcado como no realizado");
+    });
+
     document.querySelectorAll("[data-filter]").forEach(button => {
       button.addEventListener("click", () => {
         document.querySelectorAll("[data-filter]").forEach(item => item.classList.remove("active"));
@@ -2303,18 +2558,41 @@
         items: readableOrder,
         total: totalNumber,
         payment,
-        status: "Pago confirmado",
+        status: "Pendiente de confirmacion",
         createdAt: new Date().toLocaleString("es-CO")
       };
       orders.push(order);
-      localStorage.setItem(storageKeys.orders, JSON.stringify(orders));
+      saveOrders();
       adminNotifications.push(order);
       saveAdminNotifications();
       cart.clear();
       renderCart();
       renderAdmin();
       closePayment();
-      showToast("Compra exitosa. Administrador notificado");
+      showToast("Compra registrada. Administrador notificado");
+    });
+
+    document.getElementById("paymentForm").addEventListener("change", event => {
+      if (event.target.name === "payment") {
+        renderPaymentDetail(event.target.value);
+      }
+    });
+
+    document.getElementById("paymentSettingsForm").addEventListener("submit", event => {
+      event.preventDefault();
+      if (currentUser?.role !== "admin") {
+        openAuth();
+        return;
+      }
+      const form = new FormData(event.currentTarget);
+      paymentSettings = Object.fromEntries(Object.keys(paymentSettings).map(method => [method, {
+        account: form.get(`${method}_account`)?.trim() || "",
+        qr: form.get(`${method}_qr`)?.trim() || "",
+        notes: form.get(`${method}_notes`)?.trim() || ""
+      }]));
+      savePaymentSettings();
+      fillPaymentSettingsForm();
+      showToast("Datos de pago guardados");
     });
 
     document.getElementById("contactForm").addEventListener("submit", event => {
@@ -2435,6 +2713,7 @@
     }
 
     renderCatalog();
+    fillPaymentSettingsForm();
     updateAuthUI();
     renderCart();
   </script>
