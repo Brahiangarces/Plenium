@@ -1130,6 +1130,44 @@
       color: var(--ink);
     }
 
+    .client-notice {
+      display: grid;
+      gap: 12px;
+      width: min(1120px, calc(100% - 36px));
+      margin: 18px auto 0;
+      padding: 16px;
+      background: #fff8ec;
+      border: 1px solid #f0d5a8;
+      border-radius: 8px;
+    }
+
+    .client-notice[hidden] {
+      display: none;
+    }
+
+    .client-notice h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .client-notice-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .client-notice-list li {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
     .admin-panel {
       display: none;
       margin-top: 28px;
@@ -1319,6 +1357,11 @@
       </button>
     </div>
   </nav>
+
+  <section class="client-notice" data-client-notice hidden>
+    <h3>Estado de tus pagos</h3>
+    <ul class="client-notice-list" data-client-notice-list></ul>
+  </section>
 
   <main id="inicio">
     <section class="hero">
@@ -1900,6 +1943,8 @@
     const receiptPreview = document.querySelector("[data-receipt-preview]");
     const adminNotice = document.querySelector("[data-admin-notice]");
     const adminNoticeText = document.querySelector("[data-admin-notice-text]");
+    const clientNotice = document.querySelector("[data-client-notice]");
+    const clientNoticeList = document.querySelector("[data-client-notice-list]");
     const authHint = document.querySelector("[data-auth-hint]");
     const authTitle = document.getElementById("authTitle");
     const authSubmit = document.querySelector("[data-auth-submit]");
@@ -1912,6 +1957,7 @@
       user: "pleniumUser",
       orders: "pleniumOrders",
       notifications: "pleniumAdminNotifications",
+      seenClientStatuses: "pleniumSeenClientStatuses",
       paymentSettings: "pleniumPaymentSettings",
       products: "pleniumProducts",
       clients: "pleniumClients",
@@ -1919,13 +1965,9 @@
     };
     let currentClientAuthMode = "login";
     let currentUser = JSON.parse(localStorage.getItem(storageKeys.user) || "null");
-    let orders = JSON.parse(localStorage.getItem(storageKeys.orders) || "[]");
-    orders = orders.map((order, index) => ({
-      ...order,
-      id: order.id || `PED-OLD-${index}`,
-      status: order.status || "Pendiente de confirmacion"
-    }));
+    let orders = normalizeOrders(JSON.parse(localStorage.getItem(storageKeys.orders) || "[]"));
     let adminNotifications = JSON.parse(localStorage.getItem(storageKeys.notifications) || "[]");
+    let seenClientStatuses = JSON.parse(localStorage.getItem(storageKeys.seenClientStatuses) || "{}");
     let paymentSettings = JSON.parse(localStorage.getItem(storageKeys.paymentSettings) || "null") || {
       "Nequi": {
         account: "Configura el numero Nequi desde el panel administrador",
@@ -1958,6 +2000,14 @@
     ];
     if (!savedProducts && legacyCustomProducts.length) {
       localStorage.setItem(storageKeys.products, JSON.stringify(products));
+    }
+
+    function normalizeOrders(orderList) {
+      return orderList.map((order, index) => ({
+        ...order,
+        id: order.id || `PED-OLD-${index}`,
+        status: order.status || "Pendiente de confirmacion"
+      }));
     }
 
     function openCart() {
@@ -2136,6 +2186,10 @@
       localStorage.setItem(storageKeys.orders, JSON.stringify(orders));
     }
 
+    function saveSeenClientStatuses() {
+      localStorage.setItem(storageKeys.seenClientStatuses, JSON.stringify(seenClientStatuses));
+    }
+
     function savePaymentSettings() {
       localStorage.setItem(storageKeys.paymentSettings, JSON.stringify(paymentSettings));
     }
@@ -2216,6 +2270,42 @@
       return { ok: true, client, message: "Sesion iniciada" };
     }
 
+    function getClientOrders() {
+      if (currentUser?.role !== "cliente") return [];
+      return orders.filter(order => order.customer?.toLowerCase() === currentUser.email.toLowerCase());
+    }
+
+    function renderClientNotifications() {
+      const clientOrders = getClientOrders().slice(-4).reverse();
+      clientNotice.hidden = !currentUser || currentUser.role !== "cliente" || !clientOrders.length;
+      if (clientNotice.hidden) {
+        clientNoticeList.innerHTML = "";
+        return;
+      }
+      clientNoticeList.innerHTML = clientOrders.map(order => {
+        const status = order.status || "Pendiente de confirmacion";
+        const statusClass = status === "Pago confirmado" ? "confirmed" : status === "Pago rechazado" ? "rejected" : "";
+        return `
+          <li>
+            <span>${escapeHTML(order.items)} - ${formatter.format(order.total)}</span>
+            <span class="status-pill ${statusClass}">${escapeHTML(status)}</span>
+          </li>
+        `;
+      }).join("");
+    }
+
+    function notifyClientPaymentUpdates() {
+      if (currentUser?.role !== "cliente") return;
+      getClientOrders().forEach(order => {
+        if (order.status !== "Pago confirmado" && order.status !== "Pago rechazado") return;
+        const key = `${currentUser.email}:${order.id}`;
+        if (seenClientStatuses[key] === order.status) return;
+        seenClientStatuses[key] = order.status;
+        saveSeenClientStatuses();
+        showToast(order.status === "Pago confirmado" ? "Tu pago fue confirmado" : "Tu pago fue rechazado");
+      });
+    }
+
     function updateAuthUI() {
       if (currentUser?.role === "cliente") {
         const client = findClient(currentUser.email);
@@ -2241,6 +2331,8 @@
         closeQuickView();
         location.hash = "#admin";
       }
+      renderClientNotifications();
+      notifyClientPaymentUpdates();
       renderAdmin();
     }
 
@@ -2645,6 +2737,7 @@
       adminNotifications.push(order);
       saveAdminNotifications();
       renderAdmin();
+      renderClientNotifications();
       showToast(confirmButton ? "Pago confirmado" : "Pago marcado como no realizado");
     });
 
@@ -2713,6 +2806,7 @@
       cart.clear();
       renderCart();
       renderAdmin();
+      renderClientNotifications();
       closePayment();
       showToast("Compra registrada. Administrador notificado");
     });
@@ -2851,6 +2945,14 @@
       renderCatalog();
       renderCart();
       resetAdminForm();
+    });
+
+    window.addEventListener("storage", event => {
+      if (event.key !== storageKeys.orders) return;
+      orders = normalizeOrders(JSON.parse(event.newValue || "[]"));
+      renderAdmin();
+      renderClientNotifications();
+      notifyClientPaymentUpdates();
     });
 
     const revealObserver = "IntersectionObserver" in window
