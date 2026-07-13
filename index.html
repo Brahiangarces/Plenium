@@ -1019,6 +1019,19 @@
       font-size: 16px;
     }
 
+    .qr-preview {
+      display: none;
+      width: 120px;
+      aspect-ratio: 1;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .qr-preview.show {
+      display: block;
+    }
+
     .status-pill {
       display: inline-flex;
       min-height: 28px;
@@ -1478,8 +1491,9 @@
                 <input type="tel" name="Nequi_account" placeholder="Ej. 300 000 0000">
               </label>
               <label class="field">
-                QR URL
-                <input type="url" name="Nequi_qr" placeholder="https://...">
+                Imagen QR
+                <input type="file" name="Nequi_qrFile" accept="image/*" data-qr-file="Nequi">
+                <img class="qr-preview" alt="QR Nequi guardado" data-qr-preview="Nequi">
               </label>
               <label class="field full">
                 Instrucciones
@@ -1495,8 +1509,9 @@
                 <input type="tel" name="Daviplata_account" placeholder="Ej. 300 000 0000">
               </label>
               <label class="field">
-                QR URL
-                <input type="url" name="Daviplata_qr" placeholder="https://...">
+                Imagen QR
+                <input type="file" name="Daviplata_qrFile" accept="image/*" data-qr-file="Daviplata">
+                <img class="qr-preview" alt="QR Daviplata guardado" data-qr-preview="Daviplata">
               </label>
               <label class="field full">
                 Instrucciones
@@ -1512,8 +1527,9 @@
                 <input type="text" name="Transferencia bancaria_account" placeholder="Ej. Banco, tipo y numero de cuenta">
               </label>
               <label class="field">
-                QR URL
-                <input type="url" name="Transferencia bancaria_qr" placeholder="https://...">
+                Imagen QR
+                <input type="file" name="Transferencia bancaria_qrFile" accept="image/*" data-qr-file="Transferencia bancaria">
+                <img class="qr-preview" alt="QR Transferencia bancaria guardado" data-qr-preview="Transferencia bancaria">
               </label>
               <label class="field full">
                 Instrucciones
@@ -1529,8 +1545,9 @@
                 <input type="text" name="Efectivo contra entrega_account" placeholder="Ej. Disponible en entregas locales">
               </label>
               <label class="field">
-                QR URL
-                <input type="url" name="Efectivo contra entrega_qr" placeholder="Opcional">
+                Imagen QR
+                <input type="file" name="Efectivo contra entrega_qrFile" accept="image/*" data-qr-file="Efectivo contra entrega">
+                <img class="qr-preview" alt="QR Efectivo contra entrega guardado" data-qr-preview="Efectivo contra entrega">
               </label>
               <label class="field full">
                 Instrucciones
@@ -2041,12 +2058,29 @@
       localStorage.setItem(storageKeys.paymentSettings, JSON.stringify(paymentSettings));
     }
 
+    function readImageFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+      });
+    }
+
     function fillPaymentSettingsForm() {
       const form = document.getElementById("paymentSettingsForm");
       Object.entries(paymentSettings).forEach(([method, settings]) => {
         if (form.elements[`${method}_account`]) form.elements[`${method}_account`].value = settings.account || "";
-        if (form.elements[`${method}_qr`]) form.elements[`${method}_qr`].value = settings.qr || "";
         if (form.elements[`${method}_notes`]) form.elements[`${method}_notes`].value = settings.notes || "";
+        const preview = document.querySelector(`[data-qr-preview="${method}"]`);
+        if (preview) {
+          preview.classList.toggle("show", Boolean(settings.qr));
+          if (settings.qr) {
+            preview.src = settings.qr;
+          } else {
+            preview.removeAttribute("src");
+          }
+        }
       });
     }
 
@@ -2578,21 +2612,31 @@
       }
     });
 
-    document.getElementById("paymentSettingsForm").addEventListener("submit", event => {
+    document.getElementById("paymentSettingsForm").addEventListener("submit", async event => {
       event.preventDefault();
       if (currentUser?.role !== "admin") {
         openAuth();
         return;
       }
       const form = new FormData(event.currentTarget);
-      paymentSettings = Object.fromEntries(Object.keys(paymentSettings).map(method => [method, {
-        account: form.get(`${method}_account`)?.trim() || "",
-        qr: form.get(`${method}_qr`)?.trim() || "",
-        notes: form.get(`${method}_notes`)?.trim() || ""
-      }]));
-      savePaymentSettings();
-      fillPaymentSettingsForm();
-      showToast("Datos de pago guardados");
+      try {
+        const entries = await Promise.all(Object.keys(paymentSettings).map(async method => {
+          const file = form.get(`${method}_qrFile`);
+          const hasNewQr = file instanceof File && file.size > 0;
+          return [method, {
+            account: form.get(`${method}_account`)?.trim() || "",
+            qr: hasNewQr ? await readImageFile(file) : paymentSettings[method].qr || "",
+            notes: form.get(`${method}_notes`)?.trim() || ""
+          }];
+        }));
+        paymentSettings = Object.fromEntries(entries);
+        savePaymentSettings();
+        event.currentTarget.reset();
+        fillPaymentSettingsForm();
+        showToast("Datos de pago guardados");
+      } catch (error) {
+        showToast("No se pudo cargar el QR");
+      }
     });
 
     document.getElementById("contactForm").addEventListener("submit", event => {
