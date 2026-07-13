@@ -1,0 +1,2258 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plenium Cafe | Cafe y accesorios</title>
+  <meta name="description" content="Tienda de cafe de especialidad, metodos de preparacion y accesorios para baristas.">
+  <style>
+    :root {
+      --ink: #211b18;
+      --muted: #6f625b;
+      --line: #ded4cc;
+      --paper: #fbf8f3;
+      --panel: #ffffff;
+      --accent: #2f6f61;
+      --accent-2: #b65f39;
+      --gold: #c9953f;
+      --shadow: 0 18px 44px rgba(54, 43, 35, .14);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+      object-fit: cover;
+    }
+
+    button, input, textarea, select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: 0;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 8px 18px;
+      color: #fff;
+      background: var(--accent);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px clamp(18px, 5vw, 70px);
+      background: rgba(251, 248, 243, .92);
+      border-bottom: 1px solid rgba(222, 212, 204, .85);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 800;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      color: #fff;
+      background: var(--accent-2);
+      border-radius: 50%;
+      font-size: 18px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: clamp(12px, 2vw, 28px);
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 650;
+      text-decoration: none;
+      transition: color .2s ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--accent);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-btn, .cart-button {
+      display: inline-grid;
+      place-items: center;
+      min-width: 42px;
+      height: 42px;
+      color: var(--ink);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 6px 16px rgba(54, 43, 35, .08);
+      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .icon-btn:hover, .cart-button:hover {
+      transform: translateY(-2px);
+      border-color: rgba(47, 111, 97, .45);
+      box-shadow: 0 12px 24px rgba(54, 43, 35, .12);
+    }
+
+    .cart-button {
+      position: relative;
+      grid-template-columns: 18px auto;
+      gap: 8px;
+      padding: 0 13px;
+      font-weight: 800;
+    }
+
+    .cart-count {
+      position: absolute;
+      top: -7px;
+      right: -7px;
+      display: grid;
+      place-items: center;
+      min-width: 21px;
+      height: 21px;
+      padding: 0 5px;
+      color: #fff;
+      background: var(--accent-2);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .cart-count.bump {
+      animation: bump .42s ease;
+    }
+
+    .hero {
+      min-height: calc(100vh - 102px);
+      display: grid;
+      align-items: end;
+      position: relative;
+      isolation: isolate;
+      padding: clamp(34px, 7vw, 84px) clamp(18px, 5vw, 70px);
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background-image:
+        linear-gradient(90deg, rgba(20, 15, 12, .83), rgba(20, 15, 12, .42) 46%, rgba(20, 15, 12, .08)),
+        url("https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=2200&q=82");
+      background-position: center;
+      background-size: cover;
+      transform: scale(1.02);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: clamp(18px, 5vw, 70px);
+      right: clamp(18px, 5vw, 70px);
+      bottom: 0;
+      height: 1px;
+      background: rgba(255, 255, 255, .24);
+    }
+
+    .hero-content {
+      width: min(760px, 100%);
+      color: #fff;
+      padding-bottom: clamp(26px, 8vh, 74px);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 16px;
+      color: #f6d9ae;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(48px, 8vw, 92px);
+      line-height: .95;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      max-width: 600px;
+      margin: 22px 0 0;
+      color: rgba(255, 255, 255, .86);
+      font-size: clamp(17px, 2vw, 21px);
+      line-height: 1.55;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 46px;
+      padding: 0 18px;
+      color: #fff;
+      background: var(--accent);
+      border-radius: 8px;
+      font-weight: 800;
+      text-decoration: none;
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 26px rgba(47, 111, 97, .28);
+    }
+
+    .btn.secondary {
+      color: #fff;
+      background: rgba(255, 255, 255, .14);
+      border: 1px solid rgba(255, 255, 255, .42);
+      backdrop-filter: blur(8px);
+    }
+
+    .section {
+      padding: clamp(50px, 7vw, 86px) clamp(18px, 5vw, 70px);
+    }
+
+    .section.alt {
+      background: #fff;
+      border-block: 1px solid var(--line);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 22px;
+      margin-bottom: 26px;
+    }
+
+    .section-title {
+      max-width: 650px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 50px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .section-title p {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.55;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .chip {
+      min-height: 38px;
+      padding: 0 14px;
+      color: var(--muted);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-weight: 750;
+      transition: transform .2s ease, color .2s ease, background .2s ease, border-color .2s ease;
+    }
+
+    .chip:hover {
+      transform: translateY(-2px);
+      border-color: rgba(47, 111, 97, .35);
+    }
+
+    .chip.active {
+      color: #fff;
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .product {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 10px 24px rgba(54, 43, 35, .07);
+      transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    }
+
+    .product:hover {
+      transform: translateY(-5px);
+      border-color: rgba(47, 111, 97, .32);
+      box-shadow: 0 18px 36px rgba(54, 43, 35, .12);
+    }
+
+    .product-media {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      background: #eee4dc;
+    }
+
+    .product-media img {
+      width: 100%;
+      height: 100%;
+      transition: transform .35s ease;
+    }
+
+    .product:hover img { transform: scale(1.05); }
+
+    .quick-view {
+      position: absolute;
+      left: 50%;
+      bottom: 12px;
+      min-height: 38px;
+      padding: 0 13px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, .92);
+      border: 1px solid rgba(255, 255, 255, .72);
+      border-radius: 8px;
+      box-shadow: 0 10px 24px rgba(22, 17, 14, .18);
+      font-weight: 850;
+      opacity: 0;
+      transform: translate(-50%, 12px);
+      transition: opacity .2s ease, transform .2s ease;
+      white-space: nowrap;
+    }
+
+    .product:hover .quick-view,
+    .quick-view:focus-visible {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .tag {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      padding: 6px 9px;
+      color: #fff;
+      background: rgba(33, 27, 24, .82);
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .product-body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      padding: 16px;
+    }
+
+    .product h3 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .product p {
+      flex: 1;
+      margin: 9px 0 14px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .product-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .price {
+      font-size: 19px;
+      font-weight: 900;
+    }
+
+    .add-btn {
+      min-height: 40px;
+      padding: 0 12px;
+      color: #fff;
+      background: var(--accent-2);
+      border-radius: 8px;
+      font-weight: 850;
+      white-space: nowrap;
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .add-btn:hover {
+      transform: translateY(-2px);
+      background: #a95131;
+      box-shadow: 0 10px 20px rgba(182, 95, 57, .22);
+    }
+
+    .story-band {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(22px, 5vw, 62px);
+      align-items: center;
+    }
+
+    .story-media {
+      display: grid;
+      grid-template-columns: 1fr .72fr;
+      gap: 14px;
+      align-items: end;
+    }
+
+    .story-media img {
+      width: 100%;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .story-media img:first-child { aspect-ratio: 4 / 5; }
+    .story-media img:last-child { aspect-ratio: 1 / 1.15; margin-bottom: 34px; }
+
+    .feature-list {
+      display: grid;
+      gap: 14px;
+      margin: 24px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .feature-list li {
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 12px;
+      align-items: start;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .feature-icon {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      color: #fff;
+      background: var(--gold);
+      border-radius: 8px;
+    }
+
+    .bundle {
+      display: grid;
+      grid-template-columns: .9fr 1.1fr;
+      overflow: hidden;
+      background: var(--ink);
+      border-radius: 8px;
+      color: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .bundle img {
+      width: 100%;
+      height: 100%;
+      min-height: 390px;
+    }
+
+    .bundle-copy {
+      padding: clamp(28px, 5vw, 58px);
+    }
+
+    .bundle-copy h2 {
+      margin: 0;
+      font-size: clamp(32px, 5vw, 56px);
+      line-height: 1;
+    }
+
+    .bundle-copy p {
+      color: rgba(255,255,255,.76);
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    .bundle-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 24px 0;
+    }
+
+    .bundle-stat {
+      padding: 14px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+    }
+
+    .bundle-stat strong {
+      display: block;
+      font-size: 23px;
+    }
+
+    .bundle-stat span {
+      color: rgba(255,255,255,.66);
+      font-size: 13px;
+    }
+
+    .contact {
+      display: grid;
+      grid-template-columns: .85fr 1.15fr;
+      gap: clamp(22px, 5vw, 60px);
+      align-items: start;
+    }
+
+    .contact-panel {
+      padding: 24px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 10px 24px rgba(54, 43, 35, .07);
+    }
+
+    .contact-panel h3 {
+      margin: 0 0 16px;
+      font-size: 24px;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    .field input, .field textarea, .field select {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      color: var(--ink);
+      background: #fbf8f3;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      outline: 0;
+    }
+
+    .field textarea {
+      min-height: 104px;
+      resize: vertical;
+    }
+
+    .footer {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: center;
+      padding: 26px clamp(18px, 5vw, 70px);
+      color: rgba(255,255,255,.75);
+      background: #211b18;
+    }
+
+    .footer a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 750;
+    }
+
+    body.admin-mode .topbar,
+    body.admin-mode .hero,
+    body.admin-mode main > section:not(.admin-panel),
+    body.admin-mode .footer,
+    body.admin-mode .nav-links,
+    body.admin-mode [data-open-cart] {
+      display: none;
+    }
+
+    body.admin-mode {
+      background: #fff;
+    }
+
+    body.admin-mode .nav {
+      position: static;
+    }
+
+    body.admin-mode .admin-panel {
+      min-height: calc(100vh - 71px);
+      margin-top: 0;
+      border-top: 0;
+    }
+
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 39;
+      display: none;
+      background: rgba(22, 17, 14, .42);
+    }
+
+    .drawer-backdrop.open { display: block; }
+
+    .cart-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 40;
+      display: flex;
+      width: min(420px, 100%);
+      height: 100dvh;
+      flex-direction: column;
+      background: #fff;
+      box-shadow: -18px 0 44px rgba(22, 17, 14, .22);
+      transform: translateX(102%);
+      transition: transform .25s ease;
+    }
+
+    .cart-drawer.open { transform: translateX(0); }
+
+    .cart-head, .cart-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .cart-foot {
+      display: grid;
+      border-top: 1px solid var(--line);
+      border-bottom: 0;
+    }
+
+    .cart-items {
+      flex: 1;
+      overflow: auto;
+      padding: 10px 18px;
+    }
+
+    .cart-item {
+      display: grid;
+      grid-template-columns: 56px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .cart-item img {
+      width: 56px;
+      height: 56px;
+      border-radius: 8px;
+    }
+
+    .cart-item h4 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .cart-item span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .qty {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .qty button {
+      width: 28px;
+      height: 28px;
+      color: var(--ink);
+      background: #f3ece5;
+      border-radius: 6px;
+      font-weight: 900;
+    }
+
+    .total-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .empty {
+      padding: 34px 0;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      z-index: 50;
+      padding: 12px 16px;
+      color: #fff;
+      background: var(--accent);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translate(-50%, 18px);
+      transition: opacity .2s ease, transform .2s ease;
+      pointer-events: none;
+      font-weight: 800;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .auth-button {
+      min-height: 42px;
+      padding: 0 13px;
+      color: #fff;
+      background: var(--ink);
+      border-radius: 8px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .user-pill {
+      display: none;
+      max-width: 170px;
+      min-height: 42px;
+      align-items: center;
+      gap: 8px;
+      padding: 0 12px;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 800;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .user-pill.show { display: inline-flex; }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(22, 17, 14, .54);
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      width: min(460px, 100%);
+      overflow: hidden;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .quick-modal .modal {
+      width: min(820px, 100%);
+    }
+
+    .quick-detail {
+      display: grid;
+      grid-template-columns: .95fr 1fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .quick-detail img {
+      width: 100%;
+      min-height: 310px;
+      border-radius: 8px;
+    }
+
+    .quick-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .quick-copy h3 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1;
+    }
+
+    .quick-copy p {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .quick-copy .price {
+      margin-bottom: 18px;
+      font-size: 26px;
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .modal-head h3 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .role-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding: 4px;
+      background: #f3ece5;
+      border-radius: 8px;
+    }
+
+    .role-tabs button {
+      min-height: 38px;
+      color: var(--muted);
+      background: transparent;
+      border-radius: 6px;
+      font-weight: 850;
+    }
+
+    .role-tabs button.active {
+      color: var(--ink);
+      background: #fff;
+      box-shadow: 0 4px 12px rgba(54, 43, 35, .08);
+    }
+
+    .hint {
+      margin: 8px 0 16px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .admin-panel {
+      display: none;
+      margin-top: 28px;
+    }
+
+    .admin-panel.show { display: block; }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .admin-card {
+      padding: 18px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 10px 24px rgba(54, 43, 35, .07);
+    }
+
+    .admin-card span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .admin-card strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 30px;
+    }
+
+    .admin-layout {
+      display: grid;
+      grid-template-columns: .85fr 1.15fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .admin-layout + .contact-panel {
+      margin-top: 18px;
+      overflow-x: auto;
+    }
+
+    .form-actions,
+    .admin-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .text-button {
+      min-height: 38px;
+      padding: 0 11px;
+      color: var(--accent);
+      background: #eef6f3;
+      border-radius: 8px;
+      font-weight: 850;
+    }
+
+    .text-button.danger {
+      color: #a43b24;
+      background: #fff0ea;
+    }
+
+    .text-button[hidden] {
+      display: none;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .fly-image {
+      position: fixed;
+      z-index: 80;
+      width: 68px;
+      height: 68px;
+      border-radius: 8px;
+      object-fit: cover;
+      pointer-events: none;
+      box-shadow: var(--shadow);
+      transition: transform .65s cubic-bezier(.18, .8, .25, 1), opacity .65s ease;
+    }
+
+    @keyframes bump {
+      0%, 100% { transform: scale(1); }
+      38% { transform: scale(1.28); }
+      68% { transform: scale(.94); }
+    }
+
+    .admin-table th,
+    .admin-table td {
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .admin-table th {
+      color: var(--muted);
+      background: #fbf8f3;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .admin-table img {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+    }
+
+    @media (max-width: 980px) {
+      .nav-links { display: none; }
+      .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .story-band, .bundle, .contact, .admin-layout { grid-template-columns: 1fr; }
+      .bundle img { min-height: 300px; }
+    }
+
+    @media (max-width: 640px) {
+      .topbar { font-size: 12px; }
+      .nav { padding-inline: 14px; }
+      .brand span:last-child { display: none; }
+      .cart-button { min-width: 42px; padding: 0 11px; }
+      .cart-button strong { display: none; }
+      .hero { min-height: 620px; }
+      .section-head { display: grid; }
+      .filters { justify-content: start; }
+      .product-grid, .bundle-row, .field-grid, .admin-grid { grid-template-columns: 1fr; }
+      .story-media { grid-template-columns: 1fr; }
+      .story-media img:last-child { margin-bottom: 0; }
+      .footer { grid-template-columns: 1fr; }
+      .auth-button { padding: 0 10px; font-size: 13px; }
+      .user-pill { display: none !important; }
+      .quick-detail { grid-template-columns: 1fr; }
+      .quick-detail img { min-height: 220px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">Envio gratis desde $120.000 COP en cafe y accesorios seleccionados</div>
+
+  <nav class="nav" aria-label="Navegacion principal">
+    <a class="brand" href="#inicio" aria-label="Plenium Cafe inicio">
+      <span class="brand-mark">P</span>
+      <span>Plenium Cafe</span>
+    </a>
+    <div class="nav-links">
+      <a href="#cafes">Cafes</a>
+      <a href="#accesorios">Accesorios</a>
+      <a href="#kit">Kit barista</a>
+      <a href="#admin" data-admin-link hidden>Administrador</a>
+      <a href="#contacto">Contacto</a>
+    </div>
+    <div class="nav-actions">
+      <span class="user-pill" data-user-pill></span>
+      <button class="auth-button" type="button" data-auth-button>Iniciar sesion</button>
+      <button class="cart-button" type="button" aria-label="Abrir carrito" data-open-cart>
+        <span aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M6 6h15l-1.7 8.3a2 2 0 0 1-2 1.7H9.1a2 2 0 0 1-2-1.6L5.2 4H3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10 20h.01M18 20h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <strong>Carrito</strong>
+        <span class="cart-count" data-cart-count>0</span>
+      </button>
+    </div>
+  </nav>
+
+  <main id="inicio">
+    <section class="hero">
+      <div class="hero-content">
+        <p class="eyebrow">Cafe de especialidad y equipo para preparar mejor</p>
+        <h1>Plenium Cafe</h1>
+        <p>Granos recien tostados, metodos de preparacion y accesorios elegidos para que cada taza tenga aroma, cuerpo y una rutina que se disfruta.</p>
+        <div class="hero-actions">
+          <a class="btn" href="#cafes">Comprar cafe</a>
+          <a class="btn secondary" href="#accesorios">Ver accesorios</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="cafes">
+      <div class="section-head">
+        <div class="section-title">
+          <h2>Cafes destacados</h2>
+          <p>Perfiles para espresso, filtrados y prensa. Elige por origen, intensidad o el momento del dia.</p>
+        </div>
+        <div class="filters" aria-label="Filtros de productos">
+          <button class="chip active" type="button" data-filter="all">Todo</button>
+          <button class="chip" type="button" data-filter="cafe">Cafe</button>
+          <button class="chip" type="button" data-filter="accesorio">Accesorios</button>
+          <button class="chip" type="button" data-filter="kit">Kits</button>
+        </div>
+      </div>
+
+      <div class="product-grid" data-products>
+        <article class="product" data-category="cafe">
+          <div class="product-media">
+            <img src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=900&q=80" alt="Bolsa de cafe tostado con granos">
+            <span class="tag">250 g</span>
+          </div>
+          <div class="product-body">
+            <h3>Origen Huila Bourbon</h3>
+            <p>Notas a panela, naranja y chocolate. Tueste medio para filtrados limpios.</p>
+            <div class="product-bottom">
+              <span class="price">$38.000</span>
+              <button class="add-btn" type="button" data-add="Origen Huila Bourbon" data-price="38000" data-img="https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=300&q=80">Agregar</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="product" data-category="cafe">
+          <div class="product-media">
+            <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=900&q=80" alt="Cafe espresso servido en taza">
+            <span class="tag">Espresso</span>
+          </div>
+          <div class="product-body">
+            <h3>Blend Casa Plenium</h3>
+            <p>Cuerpo alto, crema estable y final dulce. Hecho para espresso y moka.</p>
+            <div class="product-bottom">
+              <span class="price">$42.000</span>
+              <button class="add-btn" type="button" data-add="Blend Casa Plenium" data-price="42000" data-img="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=300&q=80">Agregar</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="product" data-category="accesorio" id="accesorios">
+          <div class="product-media">
+            <img src="https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&w=900&q=80" alt="Metodo de preparacion pour over">
+            <span class="tag">V60</span>
+          </div>
+          <div class="product-body">
+            <h3>Dripper ceramico V60</h3>
+            <p>Control preciso de flujo y temperatura para tazas brillantes y aromaticas.</p>
+            <div class="product-bottom">
+              <span class="price">$55.000</span>
+              <button class="add-btn" type="button" data-add="Dripper ceramico V60" data-price="55000" data-img="https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&w=300&q=80">Agregar</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="product" data-category="accesorio">
+          <div class="product-media">
+            <img src="https://images.unsplash.com/photo-1572119865084-43c285814d63?auto=format&fit=crop&w=900&q=80" alt="Molino manual para cafe">
+            <span class="tag">Manual</span>
+          </div>
+          <div class="product-body">
+            <h3>Molino de muelas</h3>
+            <p>Molienda consistente con ajuste fino para espresso, prensa y filtrados.</p>
+            <div class="product-bottom">
+              <span class="price">$185.000</span>
+              <button class="add-btn" type="button" data-add="Molino de muelas" data-price="185000" data-img="https://images.unsplash.com/photo-1572119865084-43c285814d63?auto=format&fit=crop&w=300&q=80">Agregar</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="product" data-category="accesorio">
+          <div class="product-media">
+            <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=900&q=80" alt="Taza de cafe servida">
+            <span class="tag">Set x2</span>
+          </div>
+          <div class="product-body">
+            <h3>Tazas doble pared</h3>
+            <p>Vidrio termico para conservar temperatura y apreciar el color de la bebida.</p>
+            <div class="product-bottom">
+              <span class="price">$49.000</span>
+              <button class="add-btn" type="button" data-add="Tazas doble pared" data-price="49000" data-img="https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=300&q=80">Agregar</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="product" data-category="kit">
+          <div class="product-media">
+            <img src="https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=900&q=80" alt="Cafe y accesorios organizados en mesa">
+            <span class="tag">Ahorra 12%</span>
+          </div>
+          <div class="product-body">
+            <h3>Kit filtrado inicial</h3>
+            <p>Dripper, filtros, cuchara medidora y cafe Huila para comenzar sin enredos.</p>
+            <div class="product-bottom">
+              <span class="price">$119.000</span>
+              <button class="add-btn" type="button" data-add="Kit filtrado inicial" data-price="119000" data-img="https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=300&q=80">Agregar</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="product" data-category="cafe">
+          <div class="product-media">
+            <img src="https://images.unsplash.com/photo-1521302080334-4bebac2763a6?auto=format&fit=crop&w=900&q=80" alt="Granos de cafe tostado">
+            <span class="tag">Natural</span>
+          </div>
+          <div class="product-body">
+            <h3>Origen Narino Natural</h3>
+            <p>Frutos rojos, miel y aroma floral. Ideal para quienes buscan una taza viva.</p>
+            <div class="product-bottom">
+              <span class="price">$46.000</span>
+              <button class="add-btn" type="button" data-add="Origen Narino Natural" data-price="46000" data-img="https://images.unsplash.com/photo-1521302080334-4bebac2763a6?auto=format&fit=crop&w=300&q=80">Agregar</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="product" data-category="accesorio">
+          <div class="product-media">
+            <img src="https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=900&q=80" alt="Balanza y herramientas para cafe">
+            <span class="tag">Digital</span>
+          </div>
+          <div class="product-body">
+            <h3>Balanza con timer</h3>
+            <p>Precision de 0,1 g y cronometro integrado para recetas repetibles.</p>
+            <div class="product-bottom">
+              <span class="price">$89.000</span>
+              <button class="add-btn" type="button" data-add="Balanza con timer" data-price="89000" data-img="https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=300&q=80">Agregar</button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section alt">
+      <div class="story-band">
+        <div class="story-media" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1507133750040-4a8f57021571?auto=format&fit=crop&w=1000&q=82" alt="">
+          <img src="https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&w=700&q=82" alt="">
+        </div>
+        <div class="section-title">
+          <h2>Tueste fresco, rutina sencilla</h2>
+          <p>Seleccionamos cafes colombianos con trazabilidad y accesorios que resuelven el dia a dia: moler, medir, filtrar y disfrutar sin complicaciones.</p>
+          <ul class="feature-list">
+            <li><span class="feature-icon">OK</span><span>Tueste semanal y empaque con valvula para preservar aroma.</span></li>
+            <li><span class="feature-icon">OK</span><span>Recomendaciones de molienda y receta segun tu metodo.</span></li>
+            <li><span class="feature-icon">OK</span><span>Accesorios probados para casa, oficina y barras pequenas.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="kit">
+      <div class="bundle">
+        <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=1200&q=82" alt="Barista preparando cafe en barra">
+        <div class="bundle-copy">
+          <p class="eyebrow">Combo recomendado</p>
+          <h2>Kit barista en casa</h2>
+          <p>Incluye cafe Blend Casa, molino manual, balanza con timer, dripper ceramico y filtros. Perfecto para armar una estacion completa desde el primer dia.</p>
+          <div class="bundle-row">
+            <div class="bundle-stat"><strong>5</strong><span>piezas esenciales</span></div>
+            <div class="bundle-stat"><strong>12%</strong><span>menos que por separado</span></div>
+            <div class="bundle-stat"><strong>24 h</strong><span>despacho local</span></div>
+          </div>
+          <button class="btn" type="button" data-add="Kit barista en casa" data-price="329000" data-img="https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=300&q=80">Agregar kit por $329.000</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt admin-panel" id="admin" data-admin-panel>
+      <div class="section-head">
+        <div class="section-title">
+          <h2>Dashboard administrador</h2>
+          <p>Gestiona el catalogo de la tienda: agrega productos, cambia precios, edita datos o elimina publicaciones.</p>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+        <div class="admin-card">
+          <span>Ventas del dia</span>
+          <strong data-admin-sales>$0</strong>
+        </div>
+        <div class="admin-card">
+          <span>Pedidos</span>
+          <strong data-admin-orders>0</strong>
+        </div>
+        <div class="admin-card">
+          <span>Productos</span>
+          <strong data-admin-products>8</strong>
+        </div>
+        <div class="admin-card">
+          <span>Clientes</span>
+          <strong data-admin-clients>0</strong>
+        </div>
+      </div>
+
+      <div class="admin-layout">
+        <form class="contact-panel" id="adminProductForm">
+          <h3 data-admin-form-title>Agregar producto</h3>
+          <input type="hidden" name="id">
+          <label class="field">
+            Nombre
+            <input type="text" name="name" placeholder="Ej. Prensa francesa" required>
+          </label>
+          <label class="field">
+            Categoria
+            <select name="category">
+              <option value="cafe">Cafe</option>
+              <option value="accesorio">Accesorio</option>
+              <option value="kit">Kit</option>
+            </select>
+          </label>
+          <label class="field">
+            Precio COP
+            <input type="number" name="price" min="1000" step="1000" placeholder="65000" required>
+          </label>
+          <label class="field">
+            Imagen URL
+            <input type="url" name="img" placeholder="https://...">
+          </label>
+          <label class="field">
+            Descripcion
+            <textarea name="description" placeholder="Describe el producto" required></textarea>
+          </label>
+          <div class="form-actions">
+            <button class="btn" type="submit" data-admin-submit>Publicar producto</button>
+            <button class="text-button" type="button" data-cancel-edit hidden>Cancelar edicion</button>
+          </div>
+        </form>
+
+        <div class="contact-panel">
+          <h3>Productos publicados</h3>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Imagen</th>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody data-admin-product-list></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="contact-panel">
+        <h3>Clientes registrados</h3>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Correo</th>
+                <th>Estado</th>
+                <th>Ultimo acceso</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody data-admin-client-list>
+              <tr>
+                <td colspan="4">Aun no hay clientes registrados.</td>
+              </tr>
+            </tbody>
+          </table>
+      </div>
+
+      <div class="contact-panel">
+        <h3>Pedidos recientes</h3>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Pedido</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody data-admin-order-list>
+              <tr>
+                <td colspan="3">Aun no hay pedidos finalizados en esta sesion.</td>
+              </tr>
+            </tbody>
+          </table>
+      </div>
+    </section>
+
+    <section class="section alt" id="contacto">
+      <div class="contact">
+        <div class="section-title">
+          <h2>Pedido especial o venta mayorista</h2>
+          <p>Cuentanos que preparas, cuantas tazas necesitas y te recomendamos cafe, molienda y accesorios para tu rutina.</p>
+          <ul class="feature-list">
+            <li><span class="feature-icon">WA</span><span>Atencion por WhatsApp y entregas en Colombia.</span></li>
+            <li><span class="feature-icon">VIP</span><span>Planes para oficinas, restaurantes y cafeterias.</span></li>
+          </ul>
+        </div>
+        <form class="contact-panel" id="contactForm">
+          <h3>Solicitar asesoria</h3>
+          <div class="field-grid">
+            <label class="field">
+              Nombre
+              <input type="text" name="nombre" placeholder="Tu nombre" required>
+            </label>
+            <label class="field">
+              Telefono
+              <input type="tel" name="telefono" placeholder="+57 300 000 0000" required>
+            </label>
+            <label class="field">
+              Interes
+              <select name="interes">
+                <option>Cafe para casa</option>
+                <option>Accesorios</option>
+                <option>Pedido mayorista</option>
+                <option>Regalo corporativo</option>
+              </select>
+            </label>
+            <label class="field">
+              Ciudad
+              <input type="text" name="ciudad" placeholder="Bogota, Medellin...">
+            </label>
+            <label class="field full">
+              Mensaje
+              <textarea name="mensaje" placeholder="Cuentanos que metodo usas o que producto buscas"></textarea>
+            </label>
+          </div>
+          <button class="btn" type="submit">Enviar solicitud</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>&copy; 2026 Plenium Cafe. Cafe, metodos y accesorios para disfrutar mejor.</span>
+    <a href="#inicio">Volver arriba</a>
+  </footer>
+
+  <div class="drawer-backdrop" data-close-cart></div>
+  <aside class="cart-drawer" aria-label="Carrito de compras" aria-hidden="true">
+    <div class="cart-head">
+      <strong>Tu carrito</strong>
+      <button class="icon-btn" type="button" aria-label="Cerrar carrito" data-close-cart>x</button>
+    </div>
+    <div class="cart-items" data-cart-items>
+      <div class="empty">Tu carrito esta vacio. Agrega cafe o accesorios para preparar el pedido.</div>
+    </div>
+    <div class="cart-foot">
+      <div class="total-line">
+        <span>Total</span>
+        <span data-cart-total>$0</span>
+      </div>
+      <button class="btn" type="button" id="checkoutButton">Finalizar pedido</button>
+    </div>
+  </aside>
+
+  <div class="modal-backdrop" data-auth-modal>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+      <div class="modal-head">
+        <h3 id="authTitle">Iniciar sesion</h3>
+        <button class="icon-btn" type="button" aria-label="Cerrar inicio de sesion" data-close-auth>x</button>
+      </div>
+      <div class="modal-body">
+        <div class="role-tabs" aria-label="Acceso">
+          <button class="active" type="button" data-client-auth-mode="login">Iniciar sesion</button>
+          <button type="button" data-client-auth-mode="register">Registrarse</button>
+        </div>
+        <p class="hint" data-auth-hint>Entra con tu correo para poder agregar productos al carrito y finalizar compras.</p>
+        <form id="authForm">
+          <label class="field">
+            Correo
+            <input type="email" name="email" placeholder="correo@ejemplo.com" required>
+          </label>
+          <label class="field">
+            Contrasena
+            <input type="password" name="password" placeholder="Minimo 4 caracteres" minlength="4" required>
+          </label>
+          <button class="btn" type="submit" data-auth-submit>Entrar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop quick-modal" data-quick-modal>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="quickTitle">
+      <div class="modal-head">
+        <h3 id="quickTitle">Detalle del producto</h3>
+        <button class="icon-btn" type="button" aria-label="Cerrar vista rapida" data-close-quick>x</button>
+      </div>
+      <div class="modal-body" data-quick-content></div>
+    </div>
+  </div>
+
+  <div class="toast" data-toast>Producto agregado</div>
+
+  <script>
+    const formatter = new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      maximumFractionDigits: 0
+    });
+
+    const cart = new Map();
+    const cartDrawer = document.querySelector(".cart-drawer");
+    const backdrop = document.querySelector(".drawer-backdrop");
+    const cartItems = document.querySelector("[data-cart-items]");
+    const cartCount = document.querySelector("[data-cart-count]");
+    const cartTotal = document.querySelector("[data-cart-total]");
+    const toast = document.querySelector("[data-toast]");
+    const authModal = document.querySelector("[data-auth-modal]");
+    const authButton = document.querySelector("[data-auth-button]");
+    const userPill = document.querySelector("[data-user-pill]");
+    const adminPanel = document.querySelector("[data-admin-panel]");
+    const adminLink = document.querySelector("[data-admin-link]");
+    const authHint = document.querySelector("[data-auth-hint]");
+    const authTitle = document.getElementById("authTitle");
+    const authSubmit = document.querySelector("[data-auth-submit]");
+    const productGrid = document.querySelector("[data-products]");
+    const quickModal = document.querySelector("[data-quick-modal]");
+    const quickContent = document.querySelector("[data-quick-content]");
+    const openCartButton = document.querySelector("[data-open-cart]");
+    const storageKeys = {
+      user: "pleniumUser",
+      orders: "pleniumOrders",
+      products: "pleniumProducts",
+      clients: "pleniumClients",
+      legacyCustomProducts: "pleniumCustomProducts"
+    };
+    let currentClientAuthMode = "login";
+    let currentUser = JSON.parse(localStorage.getItem(storageKeys.user) || "null");
+    let orders = JSON.parse(localStorage.getItem(storageKeys.orders) || "[]");
+    let clients = JSON.parse(localStorage.getItem(storageKeys.clients) || "[]");
+    const initialProducts = readInitialProducts();
+    const savedProducts = JSON.parse(localStorage.getItem(storageKeys.products) || "null");
+    const legacyCustomProducts = JSON.parse(localStorage.getItem(storageKeys.legacyCustomProducts) || "[]");
+    let products = savedProducts || [
+      ...initialProducts,
+      ...legacyCustomProducts.map(product => ({ ...product, id: product.id || makeProductId(product.name) }))
+    ];
+    if (!savedProducts && legacyCustomProducts.length) {
+      localStorage.setItem(storageKeys.products, JSON.stringify(products));
+    }
+
+    function openCart() {
+      cartDrawer.classList.add("open");
+      backdrop.classList.add("open");
+      cartDrawer.setAttribute("aria-hidden", "false");
+    }
+
+    function closeCart() {
+      cartDrawer.classList.remove("open");
+      backdrop.classList.remove("open");
+      cartDrawer.setAttribute("aria-hidden", "true");
+    }
+
+    function openAuth() {
+      setClientAuthMode("login");
+      authModal.classList.add("open");
+      authModal.querySelector("input[name='email']").focus();
+    }
+
+    function closeAuth() {
+      authModal.classList.remove("open");
+    }
+
+    function closeQuickView() {
+      quickModal.classList.remove("open");
+      quickContent.innerHTML = "";
+    }
+
+    function setClientAuthMode(mode) {
+      currentClientAuthMode = mode;
+      document.querySelectorAll("[data-client-auth-mode]").forEach(tab => {
+        tab.classList.toggle("active", tab.dataset.clientAuthMode === mode);
+      });
+      updateAuthCopy();
+    }
+
+    function updateAuthCopy() {
+      const isRegister = currentClientAuthMode === "register";
+      authTitle.textContent = isRegister ? "Registrar cliente" : "Iniciar sesion";
+      authSubmit.textContent = isRegister ? "Crear cuenta" : "Entrar";
+      authHint.textContent = isRegister
+        ? "El registro es solo para clientes nuevos. El administrador no se registra."
+        : "Clientes registrados y administrador entran aqui con su correo y contrasena.";
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    function pulseCart() {
+      cartCount.classList.remove("bump");
+      void cartCount.offsetWidth;
+      cartCount.classList.add("bump");
+    }
+
+    function requireLogin(message = "Inicia sesion para comprar") {
+      if (currentUser) {
+        const client = currentUser.role === "cliente" ? findClient(currentUser.email) : null;
+        if (client?.blocked) {
+          currentUser = null;
+          localStorage.removeItem(storageKeys.user);
+          updateAuthUI();
+          showToast("Tu cuenta esta bloqueada");
+          openAuth();
+          return false;
+        }
+        return true;
+      }
+      showToast(message);
+      openAuth();
+      return false;
+    }
+
+    function escapeHTML(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[char]));
+    }
+
+    function makeProductId(name) {
+      return `${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}-${Date.now()}`;
+    }
+
+    function readInitialProducts() {
+      return [...productGrid.querySelectorAll(".product")].map((card, index) => {
+        const button = card.querySelector("[data-add]");
+        return {
+          id: `base-${index + 1}`,
+          name: button.dataset.add,
+          category: card.dataset.category,
+          price: Number(button.dataset.price),
+          img: card.querySelector("img")?.src || button.dataset.img,
+          description: card.querySelector(".product-body p")?.textContent.trim() || ""
+        };
+      });
+    }
+
+    function saveProducts() {
+      localStorage.setItem(storageKeys.products, JSON.stringify(products));
+    }
+
+    function saveClients() {
+      localStorage.setItem(storageKeys.clients, JSON.stringify(clients));
+    }
+
+    function findClient(email) {
+      return clients.find(client => client.email.toLowerCase() === email.toLowerCase());
+    }
+
+    function registerClient(email, password) {
+      const now = new Date().toLocaleString("es-CO");
+      const existing = findClient(email);
+      if (existing) {
+        if (existing.blocked) {
+          return { ok: false, message: "Tu cuenta esta bloqueada" };
+        }
+        if (existing.password) {
+          return { ok: false, message: "Este correo ya esta registrado. Inicia sesion." };
+        }
+        existing.password = password;
+        existing.lastLogin = now;
+        saveClients();
+        return { ok: true, client: existing, message: "Cuenta creada" };
+      }
+      const client = {
+        email,
+        password,
+        blocked: false,
+        createdAt: now,
+        lastLogin: now
+      };
+      clients.push(client);
+      saveClients();
+      return { ok: true, client, message: "Cuenta creada" };
+    }
+
+    function loginClient(email, password) {
+      const client = findClient(email);
+      if (!client) {
+        return { ok: false, message: "Primero registra este correo como cliente" };
+      }
+      if (client.blocked) {
+        return { ok: false, message: "Tu cuenta esta bloqueada" };
+      }
+      if (!client.password) {
+        return { ok: false, message: "Esta cuenta necesita registrarse de nuevo" };
+      }
+      if (client.password !== password) {
+        return { ok: false, message: "Contrasena incorrecta" };
+      }
+      client.lastLogin = new Date().toLocaleString("es-CO");
+      saveClients();
+      return { ok: true, client, message: "Sesion iniciada" };
+    }
+
+    function updateAuthUI() {
+      if (currentUser?.role === "cliente") {
+        const client = findClient(currentUser.email);
+        if (!client || !client.password || client.blocked) {
+          currentUser = null;
+          localStorage.removeItem(storageKeys.user);
+          cart.clear();
+          renderCart();
+          showToast(client?.blocked ? "Tu cuenta esta bloqueada" : "Inicia sesion nuevamente");
+        }
+      }
+      const isAdmin = currentUser?.role === "admin";
+      authButton.textContent = currentUser ? "Cerrar sesion" : "Iniciar sesion";
+      userPill.textContent = currentUser ? `${isAdmin ? "Admin" : "Cliente"}: ${currentUser.email}` : "";
+      userPill.classList.toggle("show", Boolean(currentUser));
+      document.body.classList.toggle("admin-mode", isAdmin);
+      adminPanel.classList.toggle("show", isAdmin);
+      adminLink.hidden = !isAdmin;
+      if (!isAdmin && location.hash === "#admin") location.hash = "#inicio";
+      if (isAdmin) {
+        closeCart();
+        closeQuickView();
+        location.hash = "#admin";
+      }
+      renderAdmin();
+    }
+
+    function productCardTemplate(product) {
+      const tag = product.category === "cafe" ? "Nuevo cafe" : product.category === "kit" ? "Kit" : "Nuevo";
+      return `
+        <article class="product" data-category="${escapeHTML(product.category)}" data-product-id="${escapeHTML(product.id)}">
+          <div class="product-media">
+            <img src="${escapeHTML(product.img)}" alt="${escapeHTML(product.name)}">
+            <span class="tag">${tag}</span>
+            <button class="quick-view" type="button" data-quick-view>Vista rapida</button>
+          </div>
+          <div class="product-body">
+            <h3>${escapeHTML(product.name)}</h3>
+            <p>${escapeHTML(product.description)}</p>
+            <div class="product-bottom">
+              <span class="price">${formatter.format(product.price)}</span>
+              <button class="add-btn" type="button" data-add="${escapeHTML(product.name)}" data-price="${product.price}" data-img="${escapeHTML(product.img)}">Agregar</button>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderCatalog() {
+      productGrid.innerHTML = products.map(productCardTemplate).join("");
+      const firstAccessory = productGrid.querySelector('[data-category="accesorio"]');
+      if (firstAccessory) firstAccessory.id = "accesorios";
+      hydrateProductCards();
+      renderAdmin();
+    }
+
+    function hydrateProductCards() {
+      document.querySelectorAll(".product").forEach(product => {
+        if (revealObserver) {
+          product.classList.add("reveal");
+        } else {
+          product.classList.add("is-visible");
+        }
+        const media = product.querySelector(".product-media");
+        if (media && !media.querySelector("[data-quick-view]")) {
+          media.insertAdjacentHTML("beforeend", '<button class="quick-view" type="button" data-quick-view>Vista rapida</button>');
+        }
+        revealObserver?.observe(product);
+      });
+    }
+
+    function getProductData(card) {
+      const product = products.find(item => item.id === card.dataset.productId);
+      if (product) return product;
+      const button = card.querySelector("[data-add]");
+      return {
+        id: card.dataset.productId || "",
+        name: button.dataset.add,
+        price: Number(button.dataset.price),
+        img: button.dataset.img || card.querySelector("img")?.src,
+        description: card.querySelector(".product-body p")?.textContent.trim() || "",
+        category: card.dataset.category
+      };
+    }
+
+    function openQuickView(card) {
+      const product = getProductData(card);
+      const categoryLabel = product.category === "cafe" ? "Cafe seleccionado" : product.category === "kit" ? "Kit recomendado" : "Accesorio destacado";
+      quickContent.innerHTML = `
+        <div class="quick-detail">
+          <img src="${escapeHTML(product.img)}" alt="${escapeHTML(product.name)}">
+          <div class="quick-copy">
+            <p class="eyebrow">${categoryLabel}</p>
+            <h3>${escapeHTML(product.name)}</h3>
+            <p>${escapeHTML(product.description)}</p>
+            <strong class="price">${formatter.format(product.price)}</strong>
+            <button class="btn" type="button" data-add="${escapeHTML(product.name)}" data-price="${product.price}" data-img="${escapeHTML(product.img)}">Agregar al carrito</button>
+          </div>
+        </div>
+      `;
+      quickModal.classList.add("open");
+    }
+
+    function animateToCart(button) {
+      const card = button.closest(".product, .quick-detail, .bundle");
+      const source = card?.querySelector("img");
+      if (!source || !openCartButton) return;
+      const start = source.getBoundingClientRect();
+      const end = openCartButton.getBoundingClientRect();
+      const flyer = source.cloneNode();
+      flyer.className = "fly-image";
+      flyer.style.left = `${start.left + start.width / 2 - 34}px`;
+      flyer.style.top = `${start.top + start.height / 2 - 34}px`;
+      document.body.appendChild(flyer);
+      requestAnimationFrame(() => {
+        flyer.style.transform = `translate(${end.left - start.left}px, ${end.top - start.top}px) scale(.28) rotate(8deg)`;
+        flyer.style.opacity = "0";
+      });
+      window.setTimeout(() => flyer.remove(), 700);
+    }
+
+    function renderAdminProducts() {
+      const list = document.querySelector("[data-admin-product-list]");
+      if (!products.length) {
+        list.innerHTML = '<tr><td colspan="4">No hay productos publicados.</td></tr>';
+        return;
+      }
+      list.innerHTML = products.map(product => `
+        <tr>
+          <td><img src="${escapeHTML(product.img)}" alt=""></td>
+          <td>
+            <strong>${escapeHTML(product.name)}</strong><br>
+            <span>${escapeHTML(product.category)}</span>
+          </td>
+          <td>${formatter.format(product.price)}</td>
+          <td>
+            <div class="admin-actions">
+              <button class="text-button" type="button" data-edit-product="${escapeHTML(product.id)}">Editar</button>
+              <button class="text-button danger" type="button" data-delete-product="${escapeHTML(product.id)}">Eliminar</button>
+            </div>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function renderAdminClients() {
+      const list = document.querySelector("[data-admin-client-list]");
+      if (!clients.length) {
+        list.innerHTML = '<tr><td colspan="4">Aun no hay clientes registrados.</td></tr>';
+        return;
+      }
+      list.innerHTML = clients.map(client => `
+        <tr>
+          <td><strong>${escapeHTML(client.email)}</strong></td>
+          <td>${client.blocked ? "Bloqueado" : client.password ? "Activo" : "Pendiente de registro"}</td>
+          <td>${escapeHTML(client.lastLogin || client.createdAt || "Sin acceso")}</td>
+          <td>
+            <div class="admin-actions">
+              <button class="text-button" type="button" data-toggle-client="${escapeHTML(client.email)}">
+                ${client.blocked ? "Desbloquear" : "Bloquear"}
+              </button>
+              <button class="text-button danger" type="button" data-delete-client="${escapeHTML(client.email)}">Eliminar</button>
+            </div>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function renderAdmin() {
+      const total = orders.reduce((sum, order) => sum + order.total, 0);
+      document.querySelector("[data-admin-sales]").textContent = formatter.format(total);
+      document.querySelector("[data-admin-orders]").textContent = orders.length;
+      document.querySelector("[data-admin-products]").textContent = products.length;
+      document.querySelector("[data-admin-clients]").textContent = clients.length;
+      renderAdminProducts();
+      renderAdminClients();
+      const list = document.querySelector("[data-admin-order-list]");
+      if (!orders.length) {
+        list.innerHTML = '<tr><td colspan="3">Aun no hay pedidos finalizados en esta sesion.</td></tr>';
+        return;
+      }
+      list.innerHTML = orders.slice(-6).reverse().map(order => `
+        <tr>
+          <td>${order.customer}</td>
+          <td>${order.items}</td>
+          <td>${formatter.format(order.total)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function resetAdminForm() {
+      const form = document.getElementById("adminProductForm");
+      form.reset();
+      form.elements.id.value = "";
+      document.querySelector("[data-admin-form-title]").textContent = "Agregar producto";
+      document.querySelector("[data-admin-submit]").textContent = "Publicar producto";
+      document.querySelector("[data-cancel-edit]").hidden = true;
+    }
+
+    function fillAdminForm(product) {
+      const form = document.getElementById("adminProductForm");
+      form.elements.id.value = product.id;
+      form.elements.name.value = product.name;
+      form.elements.category.value = product.category;
+      form.elements.price.value = product.price;
+      form.elements.img.value = product.img;
+      form.elements.description.value = product.description;
+      document.querySelector("[data-admin-form-title]").textContent = "Editar producto";
+      document.querySelector("[data-admin-submit]").textContent = "Guardar cambios";
+      document.querySelector("[data-cancel-edit]").hidden = false;
+      form.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function renderCart() {
+      const items = [...cart.values()];
+      const count = items.reduce((sum, item) => sum + item.qty, 0);
+      const total = items.reduce((sum, item) => sum + item.qty * item.price, 0);
+      cartCount.textContent = count;
+      cartTotal.textContent = formatter.format(total);
+
+      if (!items.length) {
+        cartItems.innerHTML = '<div class="empty">Tu carrito esta vacio. Agrega cafe o accesorios para preparar el pedido.</div>';
+        return;
+      }
+
+      cartItems.innerHTML = items.map(item => `
+        <div class="cart-item">
+          <img src="${item.img}" alt="">
+          <div>
+            <h4>${item.name}</h4>
+            <span>${formatter.format(item.price)}</span>
+          </div>
+          <div class="qty" aria-label="Cantidad de ${item.name}">
+            <button type="button" data-dec="${item.name}" aria-label="Quitar uno">-</button>
+            <strong>${item.qty}</strong>
+            <button type="button" data-inc="${item.name}" aria-label="Agregar uno">+</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    document.addEventListener("click", event => {
+      const add = event.target.closest("[data-add]");
+      const inc = event.target.closest("[data-inc]");
+      const dec = event.target.closest("[data-dec]");
+
+      if (add) {
+        const fromQuickView = add.closest("[data-quick-modal]");
+        if (fromQuickView && !currentUser) closeQuickView();
+        if (!requireLogin("Inicia sesion para agregar productos")) return;
+        const name = add.dataset.add;
+        const current = cart.get(name) || {
+          name,
+          price: Number(add.dataset.price),
+          img: add.dataset.img,
+          qty: 0
+        };
+        current.qty += 1;
+        cart.set(name, current);
+        renderCart();
+        animateToCart(add);
+        pulseCart();
+        showToast(`${name} agregado`);
+        if (fromQuickView) closeQuickView();
+      }
+
+      if (inc) {
+        const item = cart.get(inc.dataset.inc);
+        item.qty += 1;
+        renderCart();
+        pulseCart();
+      }
+
+      if (dec) {
+        const item = cart.get(dec.dataset.dec);
+        item.qty -= 1;
+        if (item.qty <= 0) cart.delete(item.name);
+        renderCart();
+        pulseCart();
+      }
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key !== "Escape") return;
+      closeCart();
+      closeAuth();
+      closeQuickView();
+    });
+
+    productGrid.addEventListener("click", event => {
+      const quickButton = event.target.closest("[data-quick-view]");
+      if (!quickButton) return;
+      openQuickView(quickButton.closest(".product"));
+    });
+
+    openCartButton.addEventListener("click", openCart);
+    document.querySelectorAll("[data-close-cart]").forEach(button => button.addEventListener("click", closeCart));
+    document.querySelector("[data-close-auth]").addEventListener("click", closeAuth);
+    document.querySelector("[data-close-quick]").addEventListener("click", closeQuickView);
+    authModal.addEventListener("click", event => {
+      if (event.target === authModal) closeAuth();
+    });
+    quickModal.addEventListener("click", event => {
+      if (event.target === quickModal) closeQuickView();
+    });
+    authButton.addEventListener("click", () => {
+      if (currentUser) {
+        currentUser = null;
+        localStorage.removeItem(storageKeys.user);
+        showToast("Sesion cerrada");
+        updateAuthUI();
+        return;
+      }
+      openAuth();
+    });
+    document.querySelectorAll("[data-client-auth-mode]").forEach(tab => {
+      tab.addEventListener("click", () => setClientAuthMode(tab.dataset.clientAuthMode));
+    });
+
+    document.querySelector("[data-cancel-edit]").addEventListener("click", resetAdminForm);
+
+    document.querySelector("[data-admin-product-list]").addEventListener("click", event => {
+      const editButton = event.target.closest("[data-edit-product]");
+      const deleteButton = event.target.closest("[data-delete-product]");
+
+      if (editButton) {
+        const product = products.find(item => item.id === editButton.dataset.editProduct);
+        if (product) fillAdminForm(product);
+      }
+
+      if (deleteButton) {
+        const product = products.find(item => item.id === deleteButton.dataset.deleteProduct);
+        if (!product) return;
+        const canDelete = window.confirm(`Eliminar "${product.name}" del catalogo?`);
+        if (!canDelete) return;
+        products = products.filter(item => item.id !== product.id);
+        saveProducts();
+        cart.delete(product.name);
+        renderCatalog();
+        renderCart();
+        resetAdminForm();
+        showToast("Producto eliminado");
+      }
+    });
+
+    document.querySelector("[data-admin-client-list]").addEventListener("click", event => {
+      const toggleButton = event.target.closest("[data-toggle-client]");
+      const deleteButton = event.target.closest("[data-delete-client]");
+
+      if (toggleButton) {
+        const client = findClient(toggleButton.dataset.toggleClient);
+        if (!client) return;
+        client.blocked = !client.blocked;
+        saveClients();
+        if (currentUser?.role === "cliente" && currentUser.email.toLowerCase() === client.email.toLowerCase() && client.blocked) {
+          currentUser = null;
+          localStorage.removeItem(storageKeys.user);
+          cart.clear();
+          renderCart();
+        }
+        renderAdmin();
+        showToast(client.blocked ? "Cliente bloqueado" : "Cliente desbloqueado");
+      }
+
+      if (deleteButton) {
+        const email = deleteButton.dataset.deleteClient;
+        const canDelete = window.confirm(`Eliminar la cuenta de "${email}"?`);
+        if (!canDelete) return;
+        clients = clients.filter(client => client.email.toLowerCase() !== email.toLowerCase());
+        saveClients();
+        if (currentUser?.role === "cliente" && currentUser.email.toLowerCase() === email.toLowerCase()) {
+          currentUser = null;
+          localStorage.removeItem(storageKeys.user);
+          cart.clear();
+          renderCart();
+          updateAuthUI();
+        }
+        renderAdmin();
+        showToast("Cliente eliminado");
+      }
+    });
+
+    document.querySelectorAll("[data-filter]").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("[data-filter]").forEach(item => item.classList.remove("active"));
+        button.classList.add("active");
+        const filter = button.dataset.filter;
+        document.querySelectorAll("[data-category]").forEach(product => {
+          product.hidden = filter !== "all" && product.dataset.category !== filter;
+          if (!product.hidden) revealObserver?.observe(product);
+        });
+      });
+    });
+
+    document.getElementById("checkoutButton").addEventListener("click", () => {
+      if (!requireLogin("Inicia sesion para finalizar la compra")) return;
+      if (!cart.size) {
+        showToast("Agrega productos antes de finalizar");
+        return;
+      }
+      const items = [...cart.values()];
+      const order = items.map(item => `${item.qty} x ${item.name}`).join("%0A");
+      const readableOrder = items.map(item => `${item.qty} x ${item.name}`).join(", ");
+      const totalNumber = items.reduce((sum, item) => sum + item.qty * item.price, 0);
+      const total = cartTotal.textContent;
+      orders.push({
+        customer: currentUser.email,
+        items: readableOrder,
+        total: totalNumber
+      });
+      localStorage.setItem(storageKeys.orders, JSON.stringify(orders));
+      renderAdmin();
+      window.location.href = `https://wa.me/573000000000?text=Hola%20Plenium%20Cafe,%20quiero%20hacer%20este%20pedido:%0A${order}%0ATotal:%20${encodeURIComponent(total)}`;
+    });
+
+    document.getElementById("contactForm").addEventListener("submit", event => {
+      event.preventDefault();
+      showToast("Solicitud lista para enviar");
+      event.currentTarget.reset();
+    });
+
+    document.getElementById("authForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const form = new FormData(event.currentTarget);
+      const email = form.get("email").trim();
+      const password = form.get("password").trim();
+      const isAdminLogin = email.toLowerCase() === "admin@plenium.com" && password === "admin123";
+      let nextUser = null;
+
+      if (currentClientAuthMode === "register") {
+        if (email.toLowerCase() === "admin@plenium.com") {
+          showToast("El administrador no se registra");
+          return;
+        }
+        const result = registerClient(email, password);
+        if (!result.ok) {
+          showToast(result.message);
+          return;
+        }
+        nextUser = { email, role: "cliente" };
+      } else if (isAdminLogin) {
+        nextUser = { email, role: "admin" };
+      } else {
+        const result = loginClient(email, password);
+        if (!result.ok) {
+          showToast(result.message);
+          return;
+        }
+        nextUser = { email, role: "cliente" };
+      }
+
+      currentUser = nextUser;
+      localStorage.setItem(storageKeys.user, JSON.stringify(currentUser));
+      event.currentTarget.reset();
+      closeAuth();
+      updateAuthUI();
+      showToast(currentUser.role === "admin" ? "Bienvenido administrador" : currentClientAuthMode === "register" ? "Cuenta creada" : "Sesion iniciada");
+      if (currentUser.role === "admin") location.hash = "#admin";
+    });
+
+    document.getElementById("adminProductForm").addEventListener("submit", event => {
+      event.preventDefault();
+      if (currentUser?.role !== "admin") {
+        openAuth();
+        return;
+      }
+      const form = new FormData(event.currentTarget);
+      const id = form.get("id");
+      const product = {
+        id: id || makeProductId(form.get("name").trim()),
+        name: form.get("name").trim(),
+        category: form.get("category"),
+        price: Number(form.get("price")),
+        img: form.get("img").trim() || "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=900&q=80",
+        description: form.get("description").trim()
+      };
+      const existingIndex = products.findIndex(item => item.id === id);
+      if (existingIndex >= 0) {
+        const previousName = products[existingIndex].name;
+        products[existingIndex] = product;
+        if (previousName !== product.name && cart.has(previousName)) {
+          const item = cart.get(previousName);
+          cart.delete(previousName);
+          cart.set(product.name, { ...item, name: product.name, price: product.price, img: product.img });
+        }
+        showToast("Producto actualizado");
+      } else {
+        products.push(product);
+        showToast("Producto publicado");
+      }
+      saveProducts();
+      renderCatalog();
+      renderCart();
+      resetAdminForm();
+    });
+
+    const revealObserver = "IntersectionObserver" in window
+      ? new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add("is-visible");
+            revealObserver.unobserve(entry.target);
+          });
+        }, { threshold: .14 })
+      : null;
+
+    if (revealObserver) {
+      document.querySelectorAll(".section-title, .story-media, .bundle, .contact-panel, .admin-card").forEach(element => {
+        element.classList.add("reveal");
+        revealObserver.observe(element);
+      });
+    } else {
+      document.querySelectorAll(".section-title, .story-media, .bundle, .contact-panel, .admin-card").forEach(element => {
+        element.classList.add("is-visible");
+      });
+    }
+
+    const sectionObserver = "IntersectionObserver" in window
+      ? new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            document.querySelectorAll(".nav-links a").forEach(link => {
+              link.classList.toggle("active", link.getAttribute("href") === `#${entry.target.id}`);
+            });
+          });
+        }, { rootMargin: "-38% 0px -55% 0px" })
+      : null;
+
+    if (sectionObserver) {
+      document.querySelectorAll("main section[id]").forEach(section => sectionObserver.observe(section));
+    }
+
+    renderCatalog();
+    updateAuthUI();
+    renderCart();
+  </script>
+</body>
+</html>
